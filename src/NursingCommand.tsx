@@ -16,6 +16,7 @@ export default function NursingCommand({profile}:{profile:Profile}){
  const [agent,setAgent]=useState<Agent>('coordinator'),[thread,setThread]=useState<string|null>(null);
  const [threads,setThreads]=useState<Thread[]>([]),[messages,setMessages]=useState<Msg[]>([]);
  const [input,setInput]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false);
+ const [proposal,setProposal]=useState<string|null>(null);
  const endRef=useRef<HTMLDivElement>(null),agentDef=agents.find(a=>a.id===agent)!;
  const loadThreads=useCallback(async()=>{
   if(!supabase)return;
@@ -37,6 +38,8 @@ export default function NursingCommand({profile}:{profile:Profile}){
  useEffect(()=>{endRef.current?.scrollIntoView({behavior:'smooth',block:'end'});},[messages]);
  async function send(value:string){
   const question=value.trim();if(!supabase||busy||question.length<2)return;
+  const match=agent==='coordinator'&&question.match(/^(?:criar|adicionar|cadastrar)\\s+tarefa\\s*[:\\-]?\\s*(.+)$/i);
+  if(match){const title=match[1].trim();if(title.length<3||title.length>200){setError('Título de tarefa entre 3 e 200 caracteres.');return;}setProposal(title);setInput('');setError('');return;}
   if(question.length>600){setError('Máximo de 600 caracteres por mensagem.');return;}
   setError('');setBusy(true);
   try{
@@ -53,6 +56,19 @@ export default function NursingCommand({profile}:{profile:Profile}){
    if(!id)throw Error('Conversa indisponível.');
    setInput('');await loadMessages(id);
   }catch(e){setError(e instanceof Error?e.message:'Falha ao consultar agente.');}
+  finally{setBusy(false)}
+ }
+ async function confirmTask(){
+  if(!proposal||!supabase||busy)return;
+  if(!['coordinator','nurse','technician'].includes(profile.role)){setError('Seu perfil não pode cadastrar tarefas.');return;}
+  setBusy(true);setError('');
+  try{
+   let id=thread;
+   if(!id){const {data,error:e}=await supabase.from('assistant_threads').insert({organization_id:profile.organization_id,health_unit_id:profile.health_unit_id,owner_id:profile.id,title:'Conversa de trabalho'}).select('id').single();if(e)throw e;id=data.id as string;setThread(id);await loadThreads();}
+   if(!id)throw Error('Conversa indisponível.');
+   const {error:e}=await supabase.rpc('agent_create_task',{p_thread_id:id,p_title:proposal});if(e)throw e;
+   setProposal(null);await loadMessages(id);
+  }catch(e){setError(e instanceof Error?e.message:'Não foi possível registrar a tarefa.');}
   finally{setBusy(false)}
  }
  function submit(e:FormEvent<HTMLFormElement>){e.preventDefault();void send(input);}
@@ -93,7 +109,8 @@ export default function NursingCommand({profile}:{profile:Profile}){
     </div>
     <div className="command-form-area">
      {error&&<div role="alert" className="command-error">{error}</div>}
-     <div className="command-prompt"><small>Consulta rápida</small><button type="button" disabled={busy} onClick={()=>void send(agentDef.prompt)}>{agentDef.prompt}</button></div>
+     {proposal&&<div className="command-proposal" role="region" aria-label="Confirmação para criação de tarefa"><b>Proposta de tarefa — ainda não registrada</b><p>{proposal}</p><div><button type="button" className="command-cancel" onClick={()=>setProposal(null)} disabled={busy}>Cancelar</button><button type="button" className="command-confirm" onClick={()=>void confirmTask()} disabled={busy}>Confirmar e registrar</button></div></div>}
+     <div className="command-prompt"><small>Consulta rápida</small><button type="button" disabled={busy} onClick={()=>void send(agentDef.prompt)}>{agentDef.prompt}</button>{agent==='coordinator'&&<button type="button" disabled={busy} onClick={()=>{setInput('Criar tarefa: Revisar pendências operacionais');setProposal(null)}}>Criar tarefa</button>}</div>
      <form onSubmit={submit}><label htmlFor="nursing-command-input" className="command-sr-only">Mensagem para o agente</label>
       <textarea id="nursing-command-input" rows={2} minLength={2} maxLength={600} value={input} disabled={busy}
        onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();void send(input)}}}
