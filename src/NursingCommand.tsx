@@ -1,15 +1,16 @@
 import {useCallback,useEffect,useRef,useState,type FormEvent} from 'react';
-import {Activity,ArrowRight,BotMessageSquare,CalendarDays,CheckCircle2,ClipboardList,HeartPulse,LockKeyhole,MessageCircle,Plus,RefreshCw,Send,ShieldCheck,UserRound,Workflow} from 'lucide-react';
+import {Activity,ArrowRight,BotMessageSquare,CalendarDays,CheckCircle2,ClipboardList,HeartPulse,LockKeyhole,MessageCircle,Plus,RefreshCw,Send,ShieldCheck,UserRound,Workflow,ClipboardCheck} from 'lucide-react';
 import {supabase,type Profile} from './supabase';
 import './nursing-command.css';
-type Agent='coordinator'|'visits'|'continuity'|'governance';
+type Agent='coordinator'|'visits'|'continuity'|'governance'|'handover';
 type Thread={id:string;title:string;created_at:string};
 type Msg={id:string;agent:Agent;message_role:'question'|'assistant';body:string;created_at:string};
 const agents=[
 {id:'coordinator' as Agent,label:'Gestão operacional',subtitle:'Tarefas e pendências',icon:ClipboardList,prompt:'Como estão as tarefas da unidade?',about:'Tarefas abertas e prazos operacionais.'},
 {id:'visits' as Agent,label:'Visitas domiciliares',subtitle:'Agenda e território',icon:CalendarDays,prompt:'Qual é a situação das visitas domiciliares?',about:'Visitas previstas e horários ultrapassados.'},
 {id:'continuity' as Agent,label:'Continuidade do cuidado',subtitle:'Linhas de cuidado',icon:HeartPulse,prompt:'Como estão os acompanhamentos e retornos?',about:'Acompanhamentos ativos e retornos pendentes.'},
-{id:'governance' as Agent,label:'Qualidade e governança',subtitle:'Rastreabilidade',icon:ShieldCheck,prompt:'Qual é a situação dos registros de atendimento?',about:'Rascunhos e atendimentos finalizados.'}
+{id:'governance' as Agent,label:'Qualidade e governança',subtitle:'Rastreabilidade',icon:ShieldCheck,prompt:'Qual é a situação dos registros de atendimento?',about:'Rascunhos e atendimentos finalizados.'},
+{id:'handover' as Agent,label:'Passagem de plantão',subtitle:'Resumo gerencial',icon:ClipboardCheck,prompt:'Gerar resumo gerencial de passagem de plantão',about:'Resumo de tarefas, visitas, retornos e rascunhos, sem dados de pacientes.'}
 ];
 const formatDate=(v:string)=>new Date(v).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
 export default function NursingCommand({profile}:{profile:Profile}){
@@ -51,7 +52,9 @@ export default function NursingCommand({profile}:{profile:Profile}){
     }).select('id').single();
     if(e)throw e;id=data.id as string;setThread(id);await loadThreads();
    }
-   const {error:e}=await supabase.rpc('ask_nursing_agent',{p_thread_id:id,p_agent:agent,p_question:question});
+   const {error:e}=agent==='handover'
+    ? await supabase.rpc('agent_shift_handover',{p_thread_id:id})
+    : await supabase.rpc('ask_nursing_agent',{p_thread_id:id,p_agent:agent,p_question:question});
    if(e)throw e;
    if(!id)throw Error('Conversa indisponível.');
    setInput('');await loadMessages(id);
@@ -80,13 +83,13 @@ export default function NursingCommand({profile}:{profile:Profile}){
   </section>
   <section className="command-agents" aria-label="Agentes disponíveis">
    {agents.map(a=><button type="button" key={a.id} className={'command-agent '+(agent===a.id?'selected':'')}
-    onClick={()=>setAgent(a.id)} aria-pressed={agent===a.id}>
+    onClick={()=>{setAgent(a.id);setProposal(null);setError('')}} aria-pressed={agent===a.id}>
      <a.icon size={23}/><strong>{a.label}</strong><small>{a.subtitle}</small></button>)}
   </section>
   <div className="command-grid">
-   <aside className="command-history"><div className="command-history-title"><b>Conversas</b><button type="button" title="Nova conversa" onClick={()=>{setThread(null);setError('')}}><Plus size={18}/></button></div>
+   <aside className="command-history"><div className="command-history-title"><b>Conversas</b><button type="button" title="Nova conversa" onClick={()=>{setThread(null);setProposal(null);setError('')}}><Plus size={18}/></button></div>
     <button type="button" className="command-new" onClick={()=>{setThread(null);setError('')}}><Plus size={16}/> Nova conversa</button>
-    <div className="command-thread-list">{threads.map(t=><button type="button" className={thread===t.id?'active':''} key={t.id} onClick={()=>setThread(t.id)}>
+    <div className="command-thread-list">{threads.map(t=><button type="button" className={thread===t.id?'active':''} key={t.id} onClick={()=>{setThread(t.id);setProposal(null)}}>
      <MessageCircle size={15}/><span><b>{t.title}</b><small>{formatDate(t.created_at)}</small></span></button>)}
      {threads.length===0&&<p>Seu histórico aparecerá após a primeira consulta.</p>}</div>
     <div className="command-history-foot"><ShieldCheck size={15}/> Conversas privadas por usuário</div>
@@ -97,7 +100,7 @@ export default function NursingCommand({profile}:{profile:Profile}){
      <button type="button" className="command-iconbtn" title="Atualizar" disabled={busy} onClick={()=>{if(thread)void loadMessages(thread).catch(()=>setError('Falha na atualização.'))}}><RefreshCw size={17}/></button>
     </div>
     <div className="command-transcript" role="log" aria-label="Mensagens da conversa" aria-live="polite">
-     {!messages.length&&<div className="command-welcome"><span><Workflow size={29}/></span><h3>Olá! Como posso apoiar seu turno?</h3>
+     {!messages.length&&<div className="command-welcome"><span><Workflow size={29}/></span><h3>Olá, {profile.full_name.split(' ')[0]}! Como posso apoiar seu turno?</h3>
       <p>{agentDef.about} Escolha uma consulta rápida ou descreva a informação operacional que deseja conferir.</p>
       <button type="button" disabled={busy} onClick={()=>void send(agentDef.prompt)}><Activity size={16}/>{agentDef.prompt}<ArrowRight size={14}/></button>
      </div>}
@@ -117,10 +120,10 @@ export default function NursingCommand({profile}:{profile:Profile}){
        placeholder="Ex.: Mostre a situação operacional desta unidade…"/>
       <button type="submit" aria-label="Enviar pergunta" disabled={busy||input.trim().length<2}><Send size={18}/></button>
      </form>
-     <p><LockKeyhole size={13}/> Não digite CPF, nome de pacientes ou informações de prontuário. As mensagens ficam registradas no banco institucional.</p>
+     <p><LockKeyhole size={13}/> O agente de passagem de plantão gera um resumo gerencial padronizado, sem dados de pacientes. Não digite CPF, nome de pacientes ou informações de prontuário. As mensagens ficam registradas no banco institucional.</p>
     </div>
    </section>
   </div>
-  <p className="command-disclaimer"><CheckCircle2 size={16}/> Agentes de consulta determinística; não são uma IA clínica generativa e não modificam registros assistenciais.</p>
+  <p className="command-disclaimer"><CheckCircle2 size={16}/> Agentes determinísticos, sem decisões clínicas. A criação de tarefas somente ocorre após confirmação; a passagem de plantão é um resumo administrativo.</p>
  </div>;
 }

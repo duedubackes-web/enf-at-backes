@@ -25,3 +25,8 @@ Homologar permissões com contas fictícias, criar governança de retenção/exc
 
 ## Migrações
 A v7 e v8 já estão aplicadas no Supabase remoto. Os scripts abaixo são registros para controle de versão; não reaplicar no ambiente já migrado.
+
+## Passagem de plantão gerencial (v0.8)
+A quinta especialidade do chat, **Passagem de plantão**, resume contagens de tarefas abertas, visitas previstas, retornos previstos e atendimentos em rascunho. A função `agent_shift_handover` calcula os valores exclusivamente no Supabase para a unidade do usuário. O resultado não contém nomes de pacientes, não substitui relatório assistencial e não cria atividades automaticamente.
+
+A equipe deve revisar os módulos e validar a passagem de plantão com os profissionais responsáveis. O chat não exibe ou transmite dados clínicos em texto.
