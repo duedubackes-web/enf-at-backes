@@ -2,7 +2,7 @@
 
 **Status:** MVP técnico em evolução, **não homologado** para uso clínico com dados reais.
 
-A plataforma ENF@BACKES organiza trabalho assistencial e operacional de enfermagem. A versão em desenvolvimento inclui landing page responsiva com animações leves, acesso institucional por Supabase Auth, dashboard, pacientes, atendimentos, tarefas, visitas e linhas de cuidado (pré-natal, diabetes e hipertensão).
+A plataforma ENF@BACKES organiza trabalho assistencial e operacional de enfermagem. A versão em desenvolvimento inclui landing page responsiva com animações leves, acesso institucional por Supabase Auth, dashboard, pacientes, atendimentos, tarefas, visitas, linhas de cuidado (pré-natal, diabetes e hipertensão) e uma **Central de Agentes** com chat profissional privado e criação confirmada de tarefas.
 
 ## Tecnologia
 
@@ -37,6 +37,10 @@ Migrações já executadas no projeto remoto:
 | 20261111222757 | `enf_backes_longitudinal_care_v4` |
 | 20261111222850 | `enf_backes_integrity_v5` |
 | 20261111223130 | `enf_backes_addenda_indexes_v6` |
+| 20261111225509 | `enf_backes_private_agent_chat_v7` |
+| 20261111225818 | `enf_backes_agent_rpc_hardening_v8` |
+| 20261111230050 | `enf_backes_agent_indexes_v9` |
+| 20261111230209 | `enf_backes_agent_confirmed_tasks_v10` |
 
 **Cuidado com migrações:** scripts de v4–v6 estão no repositório como registro do que foi aplicado; v1–v3 permanecem no histórico remoto e precisam ser exportados e reconciliados em um baseline antes de qualquer `supabase db push`. Não reexecute as migrations em um banco que já as recebeu.
 
@@ -49,6 +53,7 @@ Migrações já executadas no projeto remoto:
 - **Visitas**: programação e conclusão de visitas domiciliares.
 - **Linhas de cuidado**: inscrição e agenda longitudinal de pré-natal, diabetes e hipertensão.
 - **Adendos**: registrados no banco como inserções imutáveis para atendimentos finalizados; a interface dedicada ainda será homologada.
+- **Central de agentes**: chat com histórico privado, quatro especialistas operacionais determinísticos e comando de criação de tarefas com confirmação explícita.
 
 ## Acesso e segurança
 
@@ -72,8 +77,9 @@ Migrações já executadas no projeto remoto:
 
 1. Provisionamento institucional e teste ponta a ponta de autenticação.
 2. Testes de RLS com usuários e unidades fictícias distintas.
-3. Formulário de adendos, prontuário estruturado e reconciliação das migrations.
-4. Testes de acessibilidade e experiência no celular.
-5. Deploy de preview Vercel e revisão clínica/segurança antes de produção.
+3. Formulário de adendos, prontuário estruturado e reconciliação das migrations v1–v3 com o banco remoto.
+4. Provisão da conta profissional de Fernanda e validação do chat com perfis de teste.
+5. Testes de acessibilidade e experiência no celular.
+6. Deploy de preview Vercel e revisão clínica/segurança antes de produção.
 
 **Importante:** padrões OMS/OPAS são referências de governança e segurança, não uma alegação de certificação ou conformidade automática.
