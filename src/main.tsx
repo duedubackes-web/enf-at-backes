@@ -1,4 +1,4 @@
-import React,{useCallback,useEffect,useState,type FormEvent} from 'react';
+import React,{useCallback,useEffect,useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {Activity,HeartPulse,Users,ClipboardList,CalendarDays,FileText,ShieldCheck,LogOut,RefreshCw} from 'lucide-react';
 import {supabase,configured,type Profile,type Patient,type Task,type Visit,type Encounter} from './supabase';
@@ -17,7 +17,7 @@ const [user,setUser]=useState<string|null>(null),[profile,setProfile]=useState<P
 const [tab,setTab]=useState<Tab>('overview'),[error,setError]=useState(''),[busy,setBusy]=useState(false);
 const [patients,setPatients]=useState<Patient[]>([]),[tasks,setTasks]=useState<Task[]>([]);
 const [visits,setVisits]=useState<Visit[]>([]),[encounters,setEncounters]=useState<Encounter[]>([]);
-const [email,setEmail]=useState(''),[password,setPassword]=useState('');
+
 const [patientName,setPatientName]=useState(''),[patientCode,setPatientCode]=useState('');
 const [taskTitle,setTaskTitle]=useState(''),[selectedPatient,setSelectedPatient]=useState('');
 const [visitWhen,setVisitWhen]=useState(''),[notes,setNotes]=useState('');
@@ -46,9 +46,6 @@ useEffect(()=>{if(!supabase)return;
  else window.setTimeout(()=>void refresh(id),0);
  });return()=>subscription.unsubscribe();
 },[refresh]);
-async function login(e:FormEvent){e.preventDefault();if(!supabase)return;setBusy(true);setError('');
- try{const {error:e}=await supabase.auth.signInWithPassword({email,password});if(e)throw e;setPassword('')}
- catch{setError('Não foi possível autenticar. Confira suas credenciais.')}finally{setBusy(false)}}
 async function save(table:'patients'|'care_tasks'|'home_visits'|'encounters',data:Record<string,unknown>,clear:()=>void){
  if(!supabase||!profile||!user)return;setBusy(true);setError('');
  try{

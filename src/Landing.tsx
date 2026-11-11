@@ -2,7 +2,7 @@ import {useEffect,useRef,useState,type FormEvent} from 'react';
 import {
  Activity,ArrowRight,ArrowUpRight,Check,CheckCircle2,ChevronDown,ClipboardList,
  HeartPulse,LockKeyhole,Menu,ShieldCheck,Stethoscope,Users,CalendarDays,
- BarChart3,Workflow,Eye,Clock3,Sparkles,X,ChartNoAxesCombined,MapPinned
+ BarChart3,Workflow,Eye,Clock3,Sparkles,X,MapPinned
 } from 'lucide-react';
 import {configured,supabase} from './supabase';
 
