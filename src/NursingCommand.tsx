@@ -46,10 +46,11 @@ export default function NursingCommand({profile}:{profile:Profile}){
      organization_id:profile.organization_id,health_unit_id:profile.health_unit_id,
      owner_id:profile.id,title:'Conversa de trabalho'
     }).select('id').single();
-    if(e)throw e;id=data.id;setThread(id);await loadThreads();
+    if(e)throw e;id=data.id as string;setThread(id);await loadThreads();
    }
    const {error:e}=await supabase.rpc('ask_nursing_agent',{p_thread_id:id,p_agent:agent,p_question:question});
    if(e)throw e;
+   if(!id)throw Error('Conversa indisponível.');
    setInput('');await loadMessages(id);
   }catch(e){setError(e instanceof Error?e.message:'Falha ao consultar agente.');}
   finally{setBusy(false)}
