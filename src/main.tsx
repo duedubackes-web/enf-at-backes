@@ -2,7 +2,9 @@ import React,{useCallback,useEffect,useState,type FormEvent} from 'react';
 import {createRoot} from 'react-dom/client';
 import {Activity,HeartPulse,Users,ClipboardList,CalendarDays,FileText,ShieldCheck,LogOut,RefreshCw} from 'lucide-react';
 import {supabase,configured,type Profile,type Patient,type Task,type Visit,type Encounter} from './supabase';
+import Landing from './Landing';
 import './style.css';
+import './landing.css';
 
 type Tab='overview'|'patients'|'tasks'|'visits'|'encounters'|'security';
 type IconType=typeof Users;
@@ -63,7 +65,7 @@ async function update(table:'care_tasks'|'home_visits'|'encounters',id:string,fi
 function patientLabel(id:string){return patients.find(p=>p.id===id)?.full_name||'Paciente da unidade'}
 function stat(label:string,value:number,Icon:IconType){return <div className="stat"><Icon size={24}/><b>{value}</b><span>{label}</span></div>}
 if(!configured)return <div className="login"><section className="auth"><HeartPulse size={40}/><h1>ENF<span>@</span>BACKES</h1><p>Configure VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY para conectar ao banco.</p></section></div>;
-if(!user)return <div className="login"><section className="auth"><HeartPulse size={40}/><h1>ENF<span>@</span>BACKES</h1><p>Gestão Inteligente de Enfermagem</p><h2>Acesso profissional</h2><form onSubmit={login}><label>E-mail institucional<input type="email" value={email} onChange={e=>setEmail(e.target.value)} required autoComplete="username"/></label><label>Senha<input type="password" value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" required/></label><button disabled={busy}>Entrar</button></form>{error&&<p role="alert" className="error">{error}</p>}<small>Acesso restrito. Não utilizar dados reais antes da homologação.</small></section></div>;
+if(!user)return <Landing/>;
 if(!profile)return <div className="login"><section className="auth"><ShieldCheck size={38}/><h2>Aguardando vínculo institucional</h2><p>Sua conta existe, mas não tem perfil ativo atribuído por administrador.</p><button onClick={()=>void supabase?.auth.signOut()}>Sair</button></section></div>;
 return <div className="shell"><aside><div className="brand"><HeartPulse/><div><strong>ENF<span>@</span>BACKES</strong><small>Gestão Inteligente de Enfermagem</small></div></div><nav>{menu.map(x=><button key={x.id} className={tab===x.id?'active':''} onClick={()=>{setTab(x.id);setError('')}}><x.icon size={18}/>{x.label}</button>)}</nav><div className="account"><strong>{profile.full_name}</strong><small>{profile.role}</small><button onClick={()=>void supabase?.auth.signOut()}><LogOut size={16}/> Sair</button></div></aside>
 <main><header><div><small>GESTÃO ASSISTENCIAL</small><h1>{menu.find(x=>x.id===tab)?.label}</h1></div><button className="ghost" onClick={()=>void refresh(user)}><RefreshCw size={17}/> Atualizar</button></header>
