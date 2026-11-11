@@ -2,7 +2,7 @@
 
 **Status:** MVP técnico em evolução, **não homologado** para uso clínico com dados reais.
 
-A plataforma ENF@BACKES organiza trabalho assistencial e operacional de enfermagem. A versão em desenvolvimento inclui landing page responsiva com animações leves, acesso institucional por Supabase Auth, dashboard, pacientes, atendimentos, tarefas, visitas, linhas de cuidado (pré-natal, diabetes e hipertensão) e uma **Central de Agentes** com chat profissional privado e criação confirmada de tarefas.
+A plataforma ENF@BACKES organiza trabalho assistencial e operacional de enfermagem. A versão em desenvolvimento inclui landing page responsiva com animações leves, acesso institucional por Supabase Auth, dashboard com indicadores exatos, pacientes, atendimentos, tarefas, visitas, linhas de cuidado (pré-natal, diabetes e hipertensão) e uma **Central de Agentes** com chat profissional privado e criação confirmada de tarefas.
 
 ## Tecnologia
 
@@ -41,12 +41,14 @@ Migrações já executadas no projeto remoto:
 | 20261111225818 | `enf_backes_agent_rpc_hardening_v8` |
 | 20261111230050 | `enf_backes_agent_indexes_v9` |
 | 20261111230209 | `enf_backes_agent_confirmed_tasks_v10` |
+| 20261111232558 | `enf_backes_shift_handover_v11` |
+| 20261111234735 | `enf_backes_exact_operational_overview_v12` |
 
 **Cuidado com migrações:** scripts de v4–v6 estão no repositório como registro do que foi aplicado; v1–v3 permanecem no histórico remoto e precisam ser exportados e reconciliados em um baseline antes de qualquer `supabase db push`. Não reexecute as migrations em um banco que já as recebeu.
 
 ## Módulos
 
-- **Painel**: resumo amostral de pacientes, atendimentos, tarefas e visitas.
+- **Painel**: contagens completas e segregadas por unidade, calculadas no PostgreSQL (sem exposição de registros de pacientes), com alertas administrativos de prazo ultrapassado.
 - **Pacientes**: cadastro institucional com escopo da unidade.
 - **Atendimentos**: rascunhos com autoria e finalização imutável.
 - **Tarefas**: atribuições e acompanhamento operacional.
