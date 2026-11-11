@@ -38,7 +38,7 @@ export default function NursingCommand({profile}:{profile:Profile}){
  useEffect(()=>{endRef.current?.scrollIntoView({behavior:'smooth',block:'end'});},[messages]);
  async function send(value:string){
   const question=value.trim();if(!supabase||busy||question.length<2)return;
-  const match=agent==='coordinator'&&question.match(/^(?:criar|adicionar|cadastrar)\\s+tarefa\\s*[:\\-]?\\s*(.+)$/i);
+  const match=agent==='coordinator'&&question.match(/^(?:criar|adicionar|cadastrar)\s+tarefa\s*[:\-]?\s*(.+)$/i);
   if(match){const title=match[1].trim();if(title.length<3||title.length>200){setError('Título de tarefa entre 3 e 200 caracteres.');return;}setProposal(title);setInput('');setError('');return;}
   if(question.length>600){setError('Máximo de 600 caracteres por mensagem.');return;}
   setError('');setBusy(true);

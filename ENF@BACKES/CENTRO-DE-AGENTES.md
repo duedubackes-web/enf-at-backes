@@ -9,7 +9,7 @@ Após provisionamento institucional em Supabase Auth + public.profiles, a profis
 - Continuidade do cuidado: consulta programas ativos e retornos agendados ultrapassados.
 - Qualidade e governança: consulta registros de atendimento em rascunho/finalizados.
 
-Os agentes são **regras determinísticas SQL**, não LLMs generativos. As perguntas podem ser livres mas a resposta corresponde ao tema do agente selecionado. Eles não alteram cadastros nem fazem diagnósticos, prescrição ou classificação clínica.
+Os agentes de consulta são **regras determinísticas SQL**, não LLMs generativos. As perguntas podem ser livres, mas a resposta corresponde ao tema do agente selecionado. O agente de Gestão operacional também reconhece **Criar tarefa: descrição**, prepara uma confirmação e só grava após o profissional clicar em **Confirmar e registrar**. A autorização, autoria e histórico são conferidos novamente no banco. Nenhum agente faz diagnósticos, prescrição ou classificação clínica.
 
 ## Segurança
 - Chat acessível somente a usuários autenticados e com perfil institucional ativo na unidade.
