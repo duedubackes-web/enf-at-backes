@@ -1,11 +1,10 @@
 import {useCallback,useEffect,useMemo,useState,type FormEvent} from 'react';
 import {AlertCircle,ArrowRight,CalendarClock,Check,CheckCircle2,ClipboardCheck,ClipboardList,Copy,FileCheck2,Filter,RefreshCw,Search,ShieldCheck,Sparkles,Users} from 'lucide-react';
 import {supabase,type Profile} from './supabase';
+import {isDue,selectTasks,type Status,type FilterMode} from './task-priority';
 import './task-office.css';
 
-type Status='pending'|'in_progress'|'completed'|'cancelled';
 type Task={id:string;title:string;status:Status;due_at:string|null;created_at:string;completed_at:string|null};
-type FilterMode='open'|'overdue'|'today'|'done'|'all';
 type TemplateId='shift_handover'|'weekly_coordination'|'documentation_review';
 const templates:{id:TemplateId;title:string;description:string;icon:typeof Users;items:string[]}[]=[
  {id:'shift_handover',title:'Organizar passagem de plantão',description:'Padronize a conferência de pendências do turno.',icon:ClipboardCheck,
@@ -16,14 +15,16 @@ const templates:{id:TemplateId;title:string;description:string;icon:typeof Users
   items:['Conferir registros em rascunho pendentes de revisão','Verificar completude administrativa dos atendimentos','Registrar encaminhamentos para revisão documental']}
 ];
 function formatDate(v:string|null){return v?new Date(v).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'Sem prazo'}
-const isDue=(t:Task)=>t.due_at!==null&&new Date(t.due_at).getTime()<Date.now()&&['pending','in_progress'].includes(t.status);
-const isToday=(t:Task)=>{
- if(!t.due_at)return false;
- const d=new Date(t.due_at),now=new Date();
- return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
-};
 function taskStatus(v:Status){return v==='pending'?'Pendente':v==='in_progress'?'Em andamento':v==='completed'?'Concluída':'Cancelada'}
 export default function TaskOffice({profile}:{profile:Profile}){
+ const [now,setNow]=useState(Date.now);
+ useEffect(()=>{
+  const tick=()=>setNow(Date.now());
+  const timer=window.setInterval(tick,30000);
+  window.addEventListener('focus',tick);
+  document.addEventListener('visibilitychange',tick);
+  return ()=>{window.clearInterval(timer);window.removeEventListener('focus',tick);document.removeEventListener('visibilitychange',tick)};
+ },[]);
  const canWrite=['coordinator','nurse','technician'].includes(profile.role);
  const [tasks,setTasks]=useState<Task[]>([]),[filter,setFilter]=useState<FilterMode>('open');
  const [search,setSearch]=useState(''),[loading,setLoading]=useState(false),[busyId,setBusyId]=useState<string|null>(null);
@@ -44,20 +45,9 @@ export default function TaskOffice({profile}:{profile:Profile}){
   setLoading(false);
  },[profile.organization_id,profile.health_unit_id]);
  useEffect(()=>{void refresh()},[refresh]);
- const visible=useMemo(()=>tasks.filter(t=>{
-  if(!t.title.toLocaleLowerCase('pt-BR').includes(search.toLocaleLowerCase('pt-BR')))return false;
-  if(filter==='open')return t.status==='pending'||t.status==='in_progress';
-  if(filter==='overdue')return isDue(t);
-  if(filter==='today')return isToday(t)&&t.status!=='cancelled';
-  if(filter==='done')return t.status==='completed';
-  return true;
- }).sort((a,b)=>{
-  const at=a.due_at?new Date(a.due_at).getTime():Number.MAX_SAFE_INTEGER;
-  const bt=b.due_at?new Date(b.due_at).getTime():Number.MAX_SAFE_INTEGER;
-  return at-bt;
- }),[tasks,filter,search]);
+ const visible=useMemo(()=>selectTasks(tasks,filter,search,now),[tasks,filter,search,now]);
  const open=tasks.filter(t=>t.status==='pending'||t.status==='in_progress').length;
- const overdue=tasks.filter(isDue).length;
+ const overdue=tasks.filter(t=>isDue(t,now)).length;
  const done=tasks.filter(t=>t.status==='completed').length;
  const selected=templates.find(t=>t.id===pendingTemplate);
  function openTemplate(id:TemplateId){if(!canWrite)return;setPendingTemplate(id);setRequestId(crypto.randomUUID());setNotice('');setError('');}
@@ -104,7 +94,8 @@ export default function TaskOffice({profile}:{profile:Profile}){
   finally{setBusyId(null);}
  }
  async function copySummary(){
-  const summary=`ENF@BACKES — conferência administrativa\nTarefas abertas (amostra): ${open}\nCom prazo ultrapassado (amostra): ${overdue}\nConcluídas (amostra): ${done}\nGerado em: ${new Date().toLocaleString('pt-BR')}\nNúmeros limitados às 200 tarefas mais recentes. Validar nos módulos de origem.`;
+  const overdueAtCopy=tasks.filter(t=>isDue(t,Date.now())).length;
+  const summary=`ENF@BACKES — conferência administrativa\nTarefas abertas (amostra): ${open}\nCom prazo ultrapassado (amostra): ${overdueAtCopy}\nConcluídas (amostra): ${done}\nGerado em: ${new Date().toLocaleString('pt-BR')}\nNúmeros limitados às 200 tarefas mais recentes. Validar nos módulos de origem.`;
   try{await navigator.clipboard.writeText(summary);setNotice('Resumo administrativo copiado, sem nomes de pacientes.');}
   catch{setError('Não foi possível copiar; verifique as permissões do navegador.');}
  }
@@ -144,7 +135,7 @@ export default function TaskOffice({profile}:{profile:Profile}){
    <div className="office-rows">{visible.map(t=><article key={t.id} className="office-task">
     <span className={t.status==='completed'?'office-task-state done':'office-task-state'}>{t.status==='completed'?<Check size={17}/>:<ClipboardList size={17}/>}</span>
     <div><strong>{t.title}</strong><small>{taskStatus(t.status)} · {formatDate(t.due_at)}</small></div>
-    {isDue(t)&&<span className="office-overdue">Prazo ultrapassado</span>}
+    {isDue(t,now)&&<span className="office-overdue">Prazo ultrapassado</span>}
     {canWrite&&t.status!=='completed'&&t.status!=='cancelled'&&<button type="button" className="office-action" disabled={busyId!==null} onClick={()=>void changeStatus(t,'completed')}>Concluir</button>}
     {canWrite&&t.status==='completed'&&<button type="button" className="office-action" disabled={busyId!==null} onClick={()=>void changeStatus(t,'pending')}>Reabrir</button>}
    </article>)}</div>

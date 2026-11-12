@@ -15,7 +15,7 @@ A plataforma ENF@BACKES organiza trabalho assistencial e operacional de enfermag
 ## Início rápido
 
 1. Instale Node.js 22 ou outra versão compatível com o projeto.
-2. Execute `npm install` e `npm run dev`.
+2. Execute `npm ci` e `npm run dev`.
 3. Crie um arquivo local `.env` tomando `.env.example` como referência:
    - `VITE_SUPABASE_URL=https://cbofgqeqdmscmhwfcikx.supabase.co`
    - `VITE_SUPABASE_PUBLISHABLE_KEY=<chave publicável ativa do projeto>`
@@ -68,6 +68,7 @@ Migrações já executadas no projeto remoto:
 
 ## Qualidade e operação
 
+- `npm test` — testa priorização administrativa com dados fictícios.
 - `npm run typecheck` — verifica tipos.
 - `npm run build` — compila a aplicação.
 - GitHub Actions: workflow `ENF@BACKES CI`.

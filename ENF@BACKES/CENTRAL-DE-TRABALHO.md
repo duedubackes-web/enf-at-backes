@@ -31,3 +31,20 @@ Reduzir a repetição administrativa de registrar tarefas de rotina, encontrar p
 
 ## Banco
 Migração v13 aplicada ao Supabase remoto. O SQL versionado serve à revisão e não deve ser reaplicado ao projeto já migrado.
+
+## Atualização automática dos prazos
+- A fila, o filtro Hoje e os contadores de atraso são recalculados a cada 30 segundos e ao retornar o foco ou a visibilidade da aba, usando o calendário local do navegador.
+- O resumo copiado recalcula atrasos no momento da exportação. A amostra continua limitada às 200 tarefas carregadas; alterações de outros profissionais exigem Atualizar.
+- Concluídas e canceladas nunca geram alerta de atraso. Datas ausentes ou inválidas não geram alertas e ficam ao final da ordenação.
+- `npm test` cobre vencimento, virada do dia local, estados, busca e ordenação com dados fictícios. O CI instala pelo lockfile e executa os testes antes das verificações de build.
+
+## Arquitetura preservada nesta evolução
+React/TypeScript com Vite mantém o estado e a navegação no cliente. A Central de Trabalho consulta `care_tasks` com filtros explícitos de organização/unidade; a autorização efetiva permanece nas políticas RLS do Supabase. Checklists continuam na RPC `create_admin_checklist`, com confirmação e idempotência existentes. O novo cálculo de prazos é uma função pura e não realiza consultas nem gravações.
+
+Vercel mantém o projeto existente `enf-at-backes` na equipe `ebb10`, Node 22, build Vite e fallback SPA. Nenhuma migração, permissão, configuração de autenticação ou variável remota foi alterada. Testes locais não substituem a homologação de RLS, idempotência e acesso entre contas fictícias.
+
+### Evidência desta alteração
+- Instalação limpa com `npm ci`, seis testes `npm test`, `npm run typecheck`, `npm run build` e `npm run check:deploy`: aprovados localmente.
+- Chromium/Playwright local: landing renderizada; tarefa fictícia recebida por resposta simulada aparece no filtro Atrasadas após avanço do relógio em 30 segundos; perfil viewer não recebe botão Concluir; nenhum erro JavaScript no fluxo.
+- A fonte externa Google Fonts apresentou erro de certificado no navegador deste ambiente; o conteúdo carregou com fonte alternativa.
+- Não executados: autenticação institucional real, RLS entre unidades, escrita de checklists no Supabase e homologação clínica. A simulação do navegador não valida autorização no servidor.
