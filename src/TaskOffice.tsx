@@ -1,5 +1,5 @@
 import {useCallback,useEffect,useMemo,useState,type FormEvent} from 'react';
-import {AlertCircle,ArrowRight,CalendarClock,Check,CheckCircle2,ClipboardCheck,ClipboardList,Copy,FileCheck2,Filter,HeartPulse,RefreshCw,Search,ShieldCheck,Sparkles,Users} from 'lucide-react';
+import {AlertCircle,ArrowRight,CalendarClock,Check,CheckCircle2,ClipboardCheck,ClipboardList,Copy,FileCheck2,Filter,RefreshCw,Search,ShieldCheck,Sparkles,Users} from 'lucide-react';
 import {supabase,type Profile} from './supabase';
 import './task-office.css';
 
