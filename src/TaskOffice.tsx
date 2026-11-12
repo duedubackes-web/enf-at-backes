@@ -1,7 +1,7 @@
 import {useCallback,useEffect,useMemo,useState,type FormEvent} from 'react';
 import {AlertCircle,ArrowRight,CalendarClock,Check,CheckCircle2,ClipboardCheck,ClipboardList,Copy,FileCheck2,Filter,RefreshCw,Search,ShieldCheck,Sparkles,Users} from 'lucide-react';
 import {supabase,type Profile} from './supabase';
-import {isDue,selectTasks,type Status,type FilterMode} from './task-priority';
+import {administrativeSummary,isDue,selectTasks,summarizeTasks,type Status,type FilterMode} from './task-priority';
 import './task-office.css';
 
 type Task={id:string;title:string;status:Status;due_at:string|null;created_at:string;completed_at:string|null};
@@ -46,9 +46,7 @@ export default function TaskOffice({profile}:{profile:Profile}){
  },[profile.organization_id,profile.health_unit_id]);
  useEffect(()=>{void refresh()},[refresh]);
  const visible=useMemo(()=>selectTasks(tasks,filter,search,now),[tasks,filter,search,now]);
- const open=tasks.filter(t=>t.status==='pending'||t.status==='in_progress').length;
- const overdue=tasks.filter(t=>isDue(t,now)).length;
- const done=tasks.filter(t=>t.status==='completed').length;
+ const {open,overdue,upcoming,done}=useMemo(()=>summarizeTasks(tasks,now),[tasks,now]);
  const selected=templates.find(t=>t.id===pendingTemplate);
  function openTemplate(id:TemplateId){if(!canWrite)return;setPendingTemplate(id);setRequestId(crypto.randomUUID());setNotice('');setError('');}
  async function confirmTemplate(){
@@ -94,8 +92,7 @@ export default function TaskOffice({profile}:{profile:Profile}){
   finally{setBusyId(null);}
  }
  async function copySummary(){
-  const overdueAtCopy=tasks.filter(t=>isDue(t,Date.now())).length;
-  const summary=`ENF@BACKES — conferência administrativa\nTarefas abertas (amostra): ${open}\nCom prazo ultrapassado (amostra): ${overdueAtCopy}\nConcluídas (amostra): ${done}\nGerado em: ${new Date().toLocaleString('pt-BR')}\nNúmeros limitados às 200 tarefas mais recentes. Validar nos módulos de origem.`;
+  const summary=administrativeSummary(tasks,Date.now());
   try{await navigator.clipboard.writeText(summary);setNotice('Resumo administrativo copiado, sem nomes de pacientes.');}
   catch{setError('Não foi possível copiar; verifique as permissões do navegador.');}
  }
@@ -108,9 +105,10 @@ export default function TaskOffice({profile}:{profile:Profile}){
   <div className="office-mini-stats">
    <div><ClipboardList size={19}/><strong>{open}</strong><span>Abertas*</span></div>
    <div><AlertCircle size={19}/><strong>{overdue}</strong><span>Fora do prazo*</span></div>
+   <div><CalendarClock size={19}/><strong>{upcoming}</strong><span>Próximas 24h*</span></div>
    <div><CheckCircle2 size={19}/><strong>{done}</strong><span>Concluídas*</span></div>
   </div>
-  <p className="office-caption">* Resumo das últimas 200 tarefas, não uma contagem institucional completa. Consulte o Painel geral para indicadores integrais.</p>
+  <p className="office-caption">* Resumo das últimas 200 tarefas, não uma contagem institucional completa. Próximas 24h considera apenas tarefas abertas entre agora e 24 horas à frente. Consulte o Painel geral para indicadores integrais.</p>
   {error&&<div className="error" role="alert">{error}</div>}
   {notice&&<div className="office-notice" role="status"><CheckCircle2 size={17}/>{notice}</div>}
   {canWrite&&<section className="office-panel"><div className="office-panel-heading"><Sparkles size={20}/><div><h3>Automação administrativa supervisionada</h3><p>Escolha uma rotina. Você verá todas as tarefas antes de confirmar.</p></div></div>
@@ -128,7 +126,7 @@ export default function TaskOffice({profile}:{profile:Profile}){
    </form></section>}
   <section className="office-panel"><div className="office-list-heading"><div><h3>Fila de tarefas</h3><p>Priorização por prazo administrativo, sem classificação clínica.</p></div>
    <button type="button" className="office-refresh" disabled={loading} onClick={()=>void refresh()}><RefreshCw size={16}/> Atualizar</button></div>
-   <div className="office-toolbar"><div className="office-filters" role="group" aria-label="Filtrar tarefas">{([['open','Abertas'],['overdue','Atrasadas'],['today','Hoje'],['done','Concluídas'],['all','Todas']] as [FilterMode,string][]).map(([id,label])=><button type="button" key={id} aria-pressed={filter===id} className={filter===id?'active':''} onClick={()=>setFilter(id)}>{label}</button>)}</div>
+   <div className="office-toolbar"><div className="office-filters" role="group" aria-label="Filtrar tarefas">{([['open','Abertas'],['overdue','Atrasadas'],['upcoming','Próximas 24h'],['today','Hoje'],['done','Concluídas'],['all','Todas']] as [FilterMode,string][]).map(([id,label])=><button type="button" key={id} aria-pressed={filter===id} className={filter===id?'active':''} onClick={()=>setFilter(id)}>{label}</button>)}</div>
    <label className="office-search"><Search size={16}/><span className="office-sr-only">Buscar tarefas</span><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar por título"/></label></div>
    {loading&&<p className="office-caption" role="status"><Filter size={14}/> Atualizando tarefas...</p>}
    {!loading&&visible.length===0&&<p className="empty">Nenhuma tarefa encontrada para este filtro.</p>}

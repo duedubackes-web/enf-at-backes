@@ -48,3 +48,12 @@ Vercel mantém o projeto existente `enf-at-backes` na equipe `ebb10`, Node 22, b
 - Chromium/Playwright local: landing renderizada; tarefa fictícia recebida por resposta simulada aparece no filtro Atrasadas após avanço do relógio em 30 segundos; perfil viewer não recebe botão Concluir; nenhum erro JavaScript no fluxo.
 - A fonte externa Google Fonts apresentou erro de certificado no navegador deste ambiente; o conteúdo carregou com fonte alternativa.
 - Não executados: autenticação institucional real, RLS entre unidades, escrita de checklists no Supabase e homologação clínica. A simulação do navegador não valida autorização no servidor.
+
+## Planejamento das próximas 24 horas
+- Novo filtro e contador para tarefas abertas com prazo entre agora e 24 horas à frente, incluindo os dois limites; tarefas atrasadas, encerradas e sem prazo válido ficam fora da janela.
+- A janela acompanha o relógio existente, inclusive ao atravessar meia-noite. A busca e a ordenação por prazo continuam disponíveis.
+- O resumo copiado inclui próximos vencimentos e tarefas abertas sem prazo válido; exporta apenas contagens, data e contexto da amostra, sem títulos ou atributos pessoais.
+- Testes adicionais cobrem limites, mudança de estado, busca e privacidade do resumo. Nenhuma migração ou consulta clínica foi adicionada.
+- Revisão: React/Vite e RPCs Supabase existentes preservados; configuração Vercel consultada confirma projeto `enf-at-backes`, equipe `ebb10`, Node 22 e proteção SSO. Produção Vercel não é promovida nesta entrega.
+- Verificação: 10 testes, typecheck, build e check:deploy aprovados. QA de navegador não executado: ferramenta `cua_repl.js` indisponível neste ambiente. Autenticação com contas fictícias, isolamento RLS e escrita de checklists continuam pendentes de homologação.
+- A cópia privada no Sites usa o mesmo código React e a chave publicável existente no build. Seus redirects de autenticação precisam ser homologados antes de uso institucional.
