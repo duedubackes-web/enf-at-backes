@@ -1,20 +1,21 @@
 import React,{useCallback,useEffect,useState} from 'react';
 import {createRoot} from 'react-dom/client';
-import {Activity,HeartPulse,Users,ClipboardList,CalendarDays,FileText,ShieldCheck,LogOut,RefreshCw,Layers3,BotMessageSquare} from 'lucide-react';
+import {Activity,HeartPulse,Users,ClipboardList,CalendarDays,FileText,ShieldCheck,LogOut,RefreshCw,Layers3,BotMessageSquare,ClipboardCheck} from 'lucide-react';
 import {supabase,type Profile,type Patient,type Task,type Visit,type Encounter} from './supabase';
 import Landing from './Landing';
 import CarePrograms from './CarePrograms';
 import NursingCommand from './NursingCommand';
 import OperationalOverview from './OperationalOverview';
+import TaskOffice from './TaskOffice';
 import './style.css';
 import './landing.css';
 
-type Tab='overview'|'patients'|'tasks'|'visits'|'encounters'|'programs'|'assistant'|'security';
+type Tab='overview'|'patients'|'tasks'|'visits'|'encounters'|'programs'|'assistant'|'office'|'security';
 type IconType=typeof Users;
 const menu:{id:Tab;label:string;icon:IconType}[]=[
 {id:'overview',label:'Painel geral',icon:Activity},{id:'patients',label:'Pacientes',icon:Users},
 {id:'tasks',label:'Tarefas',icon:ClipboardList},{id:'visits',label:'Visitas',icon:CalendarDays},
-{id:'encounters',label:'Atendimentos',icon:FileText},{id:'programs',label:'Linhas de cuidado',icon:Layers3},{id:'assistant',label:'Central de agentes',icon:BotMessageSquare},{id:'security',label:'Governança',icon:ShieldCheck}];
+{id:'encounters',label:'Atendimentos',icon:FileText},{id:'programs',label:'Linhas de cuidado',icon:Layers3},{id:'assistant',label:'Central de agentes',icon:BotMessageSquare},{id:'office',label:'Central de trabalho',icon:ClipboardCheck},{id:'security',label:'Governança',icon:ShieldCheck}];
 function App(){
 const [user,setUser]=useState<string|null>(null),[profile,setProfile]=useState<Profile|null>(null);
 const [tab,setTab]=useState<Tab>('overview'),[error,setError]=useState(''),[busy,setBusy]=useState(false);
@@ -75,6 +76,7 @@ return <div className="shell"><aside><div className="brand"><HeartPulse/><div><s
 {tab==='encounters'&&<section className="panel"><h2>Atendimentos de enfermagem</h2>{canClinical&&<form className="vertical" onSubmit={e=>{e.preventDefault();void save('encounters',{patient_id:selectedPatient,author_id:user,notes:notes.trim(),status:'draft',encounter_type:'nursing'},()=>{setNotes('');setSelectedPatient('')})}}><select required aria-label="Paciente" value={selectedPatient} onChange={e=>setSelectedPatient(e.target.value)}><option value="">Selecionar paciente</option>{patients.map(p=><option key={p.id} value={p.id}>{p.full_name}</option>)}</select><textarea aria-label="Anotação" value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Registro descritivo (rascunho), sem diagnóstico automatizado" maxLength={5000} rows={4}/><button disabled={busy||!patients.length}>Salvar rascunho</button></form>}{encounters.map(e=><div className="item" key={e.id}><span>{patientLabel(e.patient_id)} · {new Date(e.occurred_at).toLocaleString('pt-BR')}</span><em>{e.status}</em>{canClinical&&e.status==='draft'&&<button className="ghost" disabled={busy} onClick={()=>{if(window.confirm('Finalizar? O atendimento ficará imutável.'))void update('encounters',e.id,{status:'finalized'})}}>Finalizar</button>}</div>)}{!encounters.length&&<p className="empty">Sem atendimentos registrados.</p>}<p className="notice">Adendos rastreáveis estão disponíveis no banco. O formulário de adendos e a homologação documental seguem em desenvolvimento.</p></section>}
 {tab==='programs'&&<CarePrograms patients={patients} profile={profile} canClinical={canClinical} />}
 {tab==='assistant'&&<NursingCommand profile={profile} />}
+{tab==='office'&&<TaskOffice profile={profile} />}
 {tab==='security'&&<section className="panel"><h2>Segurança e governança</h2><p>Profissional: {profile.full_name} · perfil: {profile.role}</p><p>O banco aplica isolamento por unidade e políticas RLS. Usuários não podem atribuir a si próprios um perfil.</p><p>Auditoria de alterações no schema privado; auditoria de leituras, backups e testes de permissões requerem validação institucional.</p><p>Diretrizes OMS/OPAS orientam o roadmap, sem recomendações clínicas autônomas.</p></section>}
 <footer>MVP técnico • Não utilizar com informações reais de pacientes antes da homologação institucional.</footer></main></div>;
 }
