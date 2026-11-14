@@ -26,7 +26,7 @@ npm run check:deploy
 - Do not autonomously diagnose, prescribe, triage, or classify clinical risks. AI features must be operational and respect explicit user confirmations.
 - Preserve immutable finalized records and audit history. Do not delete/rewrite clinical data.
 - Run negative RLS tests across two fictional units and different roles before enabling use with real records.
-- The 13 SQL migrations have been exported from the existing Supabase project using their **canonical versioned filenames**. They are already applied remotely. Check `supabase migration list` and connected project before any schema push; never replay them on the same database. For new databases, test sequential migration apply on disposable infrastructure first.
+- The 14 SQL migrations have been exported from the existing Supabase project using their **canonical versioned filenames**. They are already applied remotely. Check `supabase migration list` and connected project before any schema push; never replay them on the same database. For new databases, test sequential migration apply on disposable infrastructure first.
 - Vercel production may deploy automatically when merging to `main`; review the deployment target and Vercel controls. Production deployment is not clinical authorization.
 
 ## Current modules
@@ -42,3 +42,10 @@ If using Codex CLI: check `codex mcp list`; add Vercel only if missing with `cod
 3. Accessibility and mobile UX (WCAG 2.2 AA), authentication redirects and error states.
 4. Privacy retention/deletion for chat, audit of reads, backups and restore drills.
 5. Clinical governance with responsible nursing leadership; no real patient data before approval.
+
+## Desktop, Android and iOS web app
+- Cross-platform delivery is a PWA (not a published native app). Manifest, icons, offline page and service worker live in `public/`.
+- **NEVER cache** Supabase API responses, session tokens, patient information, authenticated pages, chat messages or clinical files in service workers / browser storage.
+- On mobile, check the top bar, bottom tab navigation, complete menu, logout and safe-area insets on iOS and Android.
+- Run `npm test`, `npm run typecheck`, `npm run build`, `npm run check:deploy`; then verify installability on actual Chrome/Edge desktop, Android and Safari iPhone.
+- See `ENF@BACKES/PLATAFORMAS.md`. Do not claim App Store or Play Store publication.

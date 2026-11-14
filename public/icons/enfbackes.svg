@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+<title id="title">ENF@BACKES</title>
+<rect x="0" y="0" width="512" height="512" rx="112" fill="#073c50"/>
+<rect x="26" y="26" width="460" height="460" rx="98" fill="none" stroke="#29decf" stroke-width="12" opacity=".88"/>
+<path d="M102 257h74l27-66 46 137 46-92 22 21h94" stroke="#6be8d9" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+<circle cx="378" cy="160" r="19" fill="#f36bc1" opacity=".85"/>
+</svg>

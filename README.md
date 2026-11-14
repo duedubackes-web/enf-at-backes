@@ -92,3 +92,11 @@ Migrações já executadas no projeto remoto:
 ## Continuar no Codex
 
 Abra [Codex](https://chatgpt.com/codex), selecione `duedubackes-web/enf-at-backes` e use a branch `main` após integrar o PR. Leia `AGENTS.md` e `CODEX_HANDOFF.md` antes de alterar o projeto. O projeto de Vercel existente já usa GitHub; a prontidão técnica do build não significa homologação para usar dados clínicos reais.
+
+## Instalar em computador, Android e iPhone
+
+ENF@BACKES agora possui uma **PWA**, com manifesto, ícones, tela offline segura e navegação móvel dedicada. Use a prévia da branch para validar a instalação antes de liberar a produção. No Chrome/Edge, selecione **Instalar aplicativo**; no Android, **Adicionar à tela inicial/Instalar**; no Safari do iPhone, **Compartilhar → Adicionar à Tela de Início → Abrir como App**.
+
+Os módulos de pacientes, tarefas e agentes continuam **dependentes de conexão segura**. O service worker armazena apenas uma página genérica offline; não grava registros clínicos em cache. Instalação PWA não significa aplicativo nativo publicado nas lojas.
+
+Detalhes: [`ENF@BACKES/PLATAFORMAS.md`](ENF@BACKES/PLATAFORMAS.md).
