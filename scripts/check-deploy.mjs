@@ -1,0 +1,17 @@
+import {readFileSync,existsSync} from 'node:fs';
+import assert from 'node:assert/strict';
+const config=JSON.parse(readFileSync('vercel.json','utf8'));
+const pkg=JSON.parse(readFileSync('package.json','utf8'));
+const envExample=readFileSync('.env.example','utf8');
+assert.equal(config.framework,'vite');
+assert.equal(config.outputDirectory,'dist');
+assert.equal(config.buildCommand,'npm run build');
+assert.ok(existsSync('index.html')&&existsSync('src/main.tsx')&&existsSync('src/supabase.ts'));
+assert.ok(pkg.scripts.build.includes('tsc'));
+assert.ok(envExample.includes('VITE_SUPABASE_URL='));
+assert.ok(envExample.includes('VITE_SUPABASE_PUBLISHABLE_KEY='));
+assert.ok(!envExample.includes('service_role'));
+assert.ok(!envExample.includes('postgresql://'));
+assert.ok(config.rewrites?.some(r=>r.destination==='/index.html'));
+console.log('OK: Vite, SPA routing, build and public environment variable templates');
+console.log('No live Vercel authentication, deployment or Supabase RLS test was performed by this script.');

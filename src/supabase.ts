@@ -1,0 +1,10 @@
+import {createClient} from '@supabase/supabase-js';
+const url=import.meta.env.VITE_SUPABASE_URL;
+const key=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+export const configured=Boolean(url&&key&&key!=='SUBSTITUA_PELA_CHAVE_PUBLICAVEL');
+export const supabase=configured?createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
+export type Profile={id:string;organization_id:string;health_unit_id:string;full_name:string;role:'administrator'|'coordinator'|'nurse'|'technician'|'viewer';active:boolean};
+export type Patient={id:string;local_code:string;full_name:string;birth_date:string|null;status:string};
+export type Task={id:string;title:string;status:string;due_at:string|null};
+export type Visit={id:string;patient_id:string;scheduled_at:string;status:string};
+export type Encounter={id:string;patient_id:string;occurred_at:string;status:string};
