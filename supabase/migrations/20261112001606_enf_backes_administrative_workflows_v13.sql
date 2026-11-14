@@ -1,3 +1,5 @@
+-- ENF@BACKES migration 20261112001606: enf_backes_administrative_workflows_v13
+-- Verified export from the existing Supabase migration history.
 -- ENF@BACKES v13: administrative checklists with explicit confirmation and idempotency.
 -- No automated clinical directives; no patient identifiers in the generated tasks.
 create table private.admin_checklist_runs (
@@ -104,4 +106,3 @@ grant execute on function public.create_admin_checklist(text,uuid) to authentica
 
 comment on function public.create_admin_checklist(text,uuid) is
 'Creates only preapproved administrative tasks after explicit UI confirmation, scoped to the authenticated users health unit, idempotent by request UUID.';
-

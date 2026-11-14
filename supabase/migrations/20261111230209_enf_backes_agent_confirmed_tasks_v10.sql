@@ -1,3 +1,5 @@
+-- ENF@BACKES migration 20261111230209: enf_backes_agent_confirmed_tasks_v10
+-- Verified export from the existing Supabase migration history.
 -- ENF@BACKES: controlled command action with explicit frontend confirmation.
 create function private.agent_create_task(p_thread_id uuid,p_title text)
 returns text language plpgsql security definer set search_path='' as $$
@@ -45,4 +47,3 @@ revoke all on function public.agent_create_task(uuid,text) from public,anon,auth
 grant execute on function public.agent_create_task(uuid,text) to authenticated;
 comment on function public.agent_create_task(uuid,text) is
  'Comando administrativo iniciado por ação explícita no frontend; RLS da unidade e autoria validadas no banco.';
-

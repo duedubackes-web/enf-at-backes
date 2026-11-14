@@ -1,13 +1,9 @@
-# Supabase ENF@BACKES
-Projeto remoto: `cbofgqeqdmscmhwfcikx`.
-Migrações já aplicadas remotamente (ainda não exportadas como arquivos SQL versionados):
-- `20261111215048_enf_backes_foundation_v1`
-- `20261111215141_enf_backes_hardening_v2`
-- `20261111215501_enf_backes_least_privilege_v3`
+# Supabase — migration baseline synchronized for Codex
 
-Tabelas: organizations, health_units, profiles, patients, encounters, care_tasks, home_visits.
-Auditoria privada: private.audit_events.
+Project ref: `cbofgqeqdmscmhwfcikx`. **This is an existing remote project with 13 applied migrations**.
 
-**Atenção:** não reexecute scripts de criação no projeto existente.
-Sincronizar o histórico remoto com migrações locais verificadas antes de usar `supabase db push`.
-O primeiro usuário profissional deve ser provisionado por administrador confiável, sem inscrição aberta nem privilégios concedidos no frontend.
+The migration files in `supabase/migrations` have been exported from the remote schema migration history with canonical names in the format `<version>_<name>.sql`. Each file maps one-to-one with the remote version/name, including foundation v1–v3.
+
+Do **not** automatically run `supabase db push` or `supabase migration repair` on the connected environment. First confirm the correct Supabase project, compare `supabase migration list`, review all SQL, have a backup, and test fresh-environment migrations and RLS separately.
+
+This migration baseline reflects DDL history, **not** patient records or secrets; no data export is included. Do not inject real health records into staging.

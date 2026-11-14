@@ -1,3 +1,5 @@
+-- ENF@BACKES migration 20261111222850: enf_backes_integrity_v5
+-- Verified export from the existing Supabase migration history.
 -- ENF@BACKES v5: integridade de vínculos e trilha de acompanhamento.
 -- Adoção aditiva: não altera registros existentes nem cria usuários.
 alter table public.encounters

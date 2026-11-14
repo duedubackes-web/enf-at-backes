@@ -43,8 +43,9 @@ Migrações já executadas no projeto remoto:
 | 20261111230209 | `enf_backes_agent_confirmed_tasks_v10` |
 | 20261111232558 | `enf_backes_shift_handover_v11` |
 | 20261111234735 | `enf_backes_exact_operational_overview_v12` |
+| 20261112001606 | `enf_backes_administrative_workflows_v13` |
 
-**Cuidado com migrações:** scripts de v4–v6 estão no repositório como registro do que foi aplicado; v1–v3 permanecem no histórico remoto e precisam ser exportados e reconciliados em um baseline antes de qualquer `supabase db push`. Não reexecute as migrations em um banco que já as recebeu.
+**Migrações reconciliadas:** os arquivos v1–v13 foram recuperados do histórico de migrações do Supabase e versionados com os **mesmos nomes e timestamps** registrados no banco remoto. Nunca reaplique migrações já registradas; confira o destino com `supabase migration list` antes de um eventual `supabase db push`. Faça backup e teste em ambiente descartável antes de alterações de esquema.
 
 ## Módulos
 
@@ -55,7 +56,8 @@ Migrações já executadas no projeto remoto:
 - **Visitas**: programação e conclusão de visitas domiciliares.
 - **Linhas de cuidado**: inscrição e agenda longitudinal de pré-natal, diabetes e hipertensão.
 - **Adendos**: registrados no banco como inserções imutáveis para atendimentos finalizados; a interface dedicada ainda será homologada.
-- **Central de agentes**: chat com histórico privado, quatro especialistas operacionais determinísticos e comando de criação de tarefas com confirmação explícita.
+- **Central de agentes**: chat privado com cinco agentes operacionais, criação confirmada de tarefas e resumo administrativo de passagem de plantão.
+- **Central de Trabalho**: fila de pendências, filtros, pesquisa e checklists administrativos supervisionados.
 
 ## Acesso e segurança
 
@@ -80,9 +82,13 @@ Migrações já executadas no projeto remoto:
 
 1. Provisionamento institucional e teste ponta a ponta de autenticação.
 2. Testes de RLS com usuários e unidades fictícias distintas.
-3. Formulário de adendos, prontuário estruturado e reconciliação das migrations v1–v3 com o banco remoto.
+3. Formulário de adendos e prontuário estruturado; validar migrações em ambiente limpo antes de automatizar deploy do banco.
 4. Provisão da conta profissional de Fernanda e validação do chat com perfis de teste.
 5. Testes de acessibilidade e experiência no celular.
 6. Deploy de preview Vercel e revisão clínica/segurança antes de produção.
 
 **Importante:** padrões OMS/OPAS são referências de governança e segurança, não uma alegação de certificação ou conformidade automática.
+
+## Continuar no Codex
+
+Abra [Codex](https://chatgpt.com/codex), selecione `duedubackes-web/enf-at-backes` e use a branch `main` após integrar o PR. Leia `AGENTS.md` e `CODEX_HANDOFF.md` antes de alterar o projeto. O projeto de Vercel existente já usa GitHub; a prontidão técnica do build não significa homologação para usar dados clínicos reais.

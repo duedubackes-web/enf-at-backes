@@ -1,3 +1,5 @@
+-- ENF@BACKES migration 20261111222757: enf_backes_longitudinal_care_v4
+-- Verified export from the existing Supabase migration history.
 -- ENF@BACKES: acompanhamento longitudinal e adendos (v4).
 -- Apenas registros organizacionais; sem regras diagnósticas automáticas.
 create table public.care_programs (

@@ -1,3 +1,5 @@
+-- ENF@BACKES migration 20261111225818: enf_backes_agent_rpc_hardening_v8
+-- Verified export from the existing Supabase migration history.
 -- Supabase chat RPC: unprivileged public entrypoint; privileged logic stays in private schema.
 alter function public.ask_nursing_agent(uuid,text,text) set schema private;
 revoke all on function private.ask_nursing_agent(uuid,text,text) from public,anon,authenticated;
@@ -10,4 +12,3 @@ revoke all on function public.ask_nursing_agent(uuid,text,text) from public,anon
 grant execute on function public.ask_nursing_agent(uuid,text,text) to authenticated;
 comment on function public.ask_nursing_agent(uuid,text,text) is
  'SECURITY INVOKER wrapper, checks performed in private schema; no external AI access.';
-

@@ -1,3 +1,5 @@
+-- ENF@BACKES migration 20261111234735: enf_backes_exact_operational_overview_v12
+-- Verified export from the existing Supabase migration history.
 -- ENF@BACKES v12: exact unit-level management indicators; never expose clinical row details.
 create function private.nursing_operational_overview()
 returns jsonb
@@ -66,4 +68,3 @@ grant execute on function public.nursing_operational_overview() to authenticated
 
 comment on function public.nursing_operational_overview() is
 'Exact counts scoped to caller active health unit. No row/patient data is returned. Authorizing SECURITY DEFINER implementation remains in private schema.';
-

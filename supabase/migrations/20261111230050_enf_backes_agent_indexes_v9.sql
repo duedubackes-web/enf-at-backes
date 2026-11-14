@@ -1,3 +1,5 @@
+-- ENF@BACKES migration 20261111230050: enf_backes_agent_indexes_v9
+-- Verified export from the existing Supabase migration history.
 -- ENF@BACKES v9: index assistant foreign keys for deletion checks and scope queries.
 create index assistant_threads_scoped_unit_idx
  on public.assistant_threads(organization_id,health_unit_id);

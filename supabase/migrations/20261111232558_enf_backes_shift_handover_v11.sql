@@ -1,3 +1,5 @@
+-- ENF@BACKES migration 20261111232558: enf_backes_shift_handover_v11
+-- Verified export from the existing Supabase migration history.
 -- ENF@BACKES v11: passagem de plantão gerencial, sem identificação de pacientes.
 alter table public.assistant_messages drop constraint assistant_messages_agent_check;
 alter table public.assistant_messages add constraint assistant_messages_agent_check
@@ -63,4 +65,3 @@ as $$ select private.agent_shift_handover(p_thread_id); $$;
 revoke all on function public.agent_shift_handover(uuid) from public,anon,authenticated;
 grant execute on function public.agent_shift_handover(uuid) to authenticated;
 comment on function public.agent_shift_handover(uuid) is 'Resumo operacional, sem dados identificáveis e sem aconselhamento clínico; isolamento e limite aplicados no schema privado.';
-

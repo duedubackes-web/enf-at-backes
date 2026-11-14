@@ -1,3 +1,5 @@
+-- ENF@BACKES migration 20261111225509: enf_backes_private_agent_chat_v7
+-- Verified export from the existing Supabase migration history.
 -- ENF@BACKES: chat institucional determinístico, sem envio de dados a provedores externos.
 create table public.assistant_threads(
  id uuid primary key default gen_random_uuid(),
@@ -124,4 +126,3 @@ comment on function public.ask_nursing_agent(uuid,text,text) is
  'Agentes operacionais determinísticos: contagens por unidade com acesso verificado. Não é integração com modelo generativo nem produz conteúdo clínico.';
 comment on table public.assistant_messages is
  'Mensagens privadas por profissional e unidade; não incluir dados identificáveis desnecessários ou documentação clínica em prompts.';
-
