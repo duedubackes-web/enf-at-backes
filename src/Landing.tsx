@@ -2,7 +2,7 @@ import {useEffect,useRef,useState,type FormEvent} from 'react';
 import {
  Activity,ArrowRight,ArrowUpRight,Check,CheckCircle2,ChevronDown,ClipboardList,
  HeartPulse,LockKeyhole,Menu,ShieldCheck,Stethoscope,Users,CalendarDays,
- BarChart3,Workflow,Eye,Clock3,Sparkles,X,MapPinned
+ BarChart3,Workflow,Eye,Clock3,Sparkles,X,MapPinned,BookOpen,Calculator
 } from 'lucide-react';
 import {configured,supabase} from './supabase';
 
@@ -66,6 +66,7 @@ export default function Landing(){
     <a href="#solucao" onClick={()=>setMobileOpen(false)}>Solução</a>
     <a href="#recursos" onClick={()=>setMobileOpen(false)}>Recursos</a>
     <a href="#como-funciona" onClick={()=>setMobileOpen(false)}>Como funciona</a>
+    <a href="#referencias" onClick={()=>setMobileOpen(false)}>Referências</a>
     <a href="#seguranca" onClick={()=>setMobileOpen(false)}>Segurança</a>
     <button className="lp-mobile-login" onClick={openLogin}>Acessar plataforma <ArrowRight size={16}/></button>
    </nav>
@@ -127,6 +128,19 @@ export default function Landing(){
 
    <section className="lp-section lp-steps" id="como-funciona"><div className="lp-section-heading" data-reveal><div className="lp-overline">SIMPLES NO USO. SÉRIO NA ESTRUTURA.</div><h2>Um fluxo mais claro <em>do começo ao fim.</em></h2></div><div className="lp-steps-grid">{workflow.map(s=><div className="lp-step" data-reveal key={s.number}><span>{s.number}</span><h3>{s.title}</h3><p>{s.text}</p></div>)}</div></section>
 
+   <section className="lp-knowledge" id="referencias">
+    <div className="lp-knowledge-inner">
+     <span className="lp-overline">CONHECIMENTO RESPONSÁVEL</span>
+     <h2>Referências verificáveis. Gestão mais segura.</h2>
+     <p>Biblioteca técnica de enfermagem e ferramentas administrativas com referências públicas da OMS, OPAS, Cofen, Anvisa e Ministério da Saúde. Cálculos são simulações operacionais e exigem validação profissional.</p>
+     <div className="lp-knowledge-actions">
+      <button type="button" onClick={openLogin} className="lp-btn lp-btn-dark"><BookOpen size={18}/> Abrir biblioteca profissional</button>
+      <button type="button" onClick={openLogin} className="lp-btn lp-btn-knowledge"><Calculator size={18}/> Solicitar cálculo técnico</button>
+     </div>
+     <p className="lp-knowledge-disclaimer">As fontes orientam o projeto. ENF@BACKES é independente e não possui afiliação, aprovação ou certificação da Organização Mundial da Saúde.</p>
+     <a className="lp-knowledge-source" href="https://www.who.int/publications/i/item/9789240032705" target="_blank" rel="noopener noreferrer">Consultar o Plano Global de Segurança do Paciente 2021–2030 no site da OMS <ArrowUpRight size={16}/></a>
+    </div>
+   </section>
    <section className="lp-security" id="seguranca"><div className="lp-security-inner" data-reveal><div className="lp-security-badge"><LockKeyhole size={25}/></div><div><div className="lp-overline">SEGURANÇA NÃO É UM EXTRA</div><h2>Confiança construída na arquitetura.</h2><p>O núcleo técnico prevê autenticação individual, isolamento de dados por unidade e registro de alterações. A entrada em operação com dados reais depende de testes, aprovação institucional e conformidade com a LGPD.</p></div><div className="lp-security-tags"><span><ShieldCheck size={16}/> Controle de permissões</span><span><Eye size={16}/> Rastreabilidade</span><span><HeartPulse size={16}/> Responsabilidade clínica</span></div></div></section>
 
    <section className="lp-cta" data-reveal><div className="lp-cta-shape" aria-hidden="true"/><span className="lp-overline light">ENF@BACKES</span><h2>Mais clareza na gestão.<br/>Mais presença no cuidado.</h2><p>Um novo capítulo para a gestão inteligente da enfermagem.</p><button onClick={openLogin} className="lp-btn lp-btn-white">Acessar área profissional <ArrowRight size={18}/></button></section>

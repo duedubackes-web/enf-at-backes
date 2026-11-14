@@ -1,21 +1,22 @@
 import React,{useCallback,useEffect,useState} from 'react';
 import {createRoot} from 'react-dom/client';
-import {Activity,HeartPulse,Users,ClipboardList,CalendarDays,FileText,ShieldCheck,LogOut,RefreshCw,Layers3,BotMessageSquare,ClipboardCheck} from 'lucide-react';
+import {Activity,HeartPulse,Users,ClipboardList,CalendarDays,FileText,ShieldCheck,LogOut,RefreshCw,Layers3,BotMessageSquare,ClipboardCheck,BookOpen,Calculator} from 'lucide-react';
 import {supabase,type Profile,type Patient,type Task,type Visit,type Encounter} from './supabase';
 import Landing from './Landing';
 import CarePrograms from './CarePrograms';
 import NursingCommand from './NursingCommand';
 import OperationalOverview from './OperationalOverview';
 import TaskOffice from './TaskOffice';
+import KnowledgeCenter from './KnowledgeCenter';
 import './style.css';
 import './landing.css';
 
-type Tab='overview'|'patients'|'tasks'|'visits'|'encounters'|'programs'|'assistant'|'office'|'security';
+type Tab='overview'|'patients'|'tasks'|'visits'|'encounters'|'programs'|'assistant'|'office'|'knowledge'|'security';
 type IconType=typeof Users;
 const menu:{id:Tab;label:string;icon:IconType}[]=[
 {id:'overview',label:'Painel geral',icon:Activity},{id:'patients',label:'Pacientes',icon:Users},
 {id:'tasks',label:'Tarefas',icon:ClipboardList},{id:'visits',label:'Visitas',icon:CalendarDays},
-{id:'encounters',label:'Atendimentos',icon:FileText},{id:'programs',label:'Linhas de cuidado',icon:Layers3},{id:'assistant',label:'Central de agentes',icon:BotMessageSquare},{id:'office',label:'Central de trabalho',icon:ClipboardCheck},{id:'security',label:'Governança',icon:ShieldCheck}];
+{id:'encounters',label:'Atendimentos',icon:FileText},{id:'programs',label:'Linhas de cuidado',icon:Layers3},{id:'assistant',label:'Central de agentes',icon:BotMessageSquare},{id:'office',label:'Central de trabalho',icon:ClipboardCheck},{id:'knowledge',label:'Biblioteca e cálculos',icon:BookOpen},{id:'security',label:'Governança',icon:ShieldCheck}];
 function App(){
 const [user,setUser]=useState<string|null>(null),[profile,setProfile]=useState<Profile|null>(null);
 const [tab,setTab]=useState<Tab>('overview'),[error,setError]=useState(''),[busy,setBusy]=useState(false);
@@ -77,6 +78,7 @@ return <div className="shell"><aside><div className="brand"><HeartPulse/><div><s
 {tab==='programs'&&<CarePrograms patients={patients} profile={profile} canClinical={canClinical} />}
 {tab==='assistant'&&<NursingCommand profile={profile} />}
 {tab==='office'&&<TaskOffice profile={profile} />}
+{tab==='knowledge'&&<KnowledgeCenter profile={profile} />}
 {tab==='security'&&<section className="panel"><h2>Segurança e governança</h2><p>Profissional: {profile.full_name} · perfil: {profile.role}</p><p>O banco aplica isolamento por unidade e políticas RLS. Usuários não podem atribuir a si próprios um perfil.</p><p>Auditoria de alterações no schema privado; auditoria de leituras, backups e testes de permissões requerem validação institucional.</p><p>Diretrizes OMS/OPAS orientam o roadmap, sem recomendações clínicas autônomas.</p></section>}
 <footer>MVP técnico • Não utilizar com informações reais de pacientes antes da homologação institucional.</footer></main></div>;
 }
