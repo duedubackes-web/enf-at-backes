@@ -38,3 +38,6 @@ The Vercel team and project have already been connected to this repository. Prev
 
 ## Migration history
 All 13 versions in `supabase/migrations/` were taken from the remote `supabase_migrations.schema_migrations` table and filenames now match each recorded version and name. They are **already applied** to the connected project; use migrations only for new disposable testing environments after verification.
+
+## Cross-platform PWA update
+Branch `feat/cross-platform-pwa-v12` provides: manifest + PNG icons, iOS metadata, secure offline fallback, responsive authenticated bottom navigation and install instructions. After the PR merges, these files become part of main. **Do not cache API/clinical responses**. Native app stores are a separate roadmap, not delivered yet.
