@@ -39,3 +39,15 @@ test('busca em português, estados e ordenação preservam a lista original',()=
  assert.deepEqual(selectTasks(entries,'all','inexistente',due),[]);
  assert.equal(selectTasks([{...item,status:'completed'}],'done','',due).length,1);
 });
+
+test('busca aceita acentos, caixa e espaços externos sem perder o filtro',()=>{
+ const entries=[task('a',null,'pending','Organização fictícia'),task('b',null,'completed','Organização concluída')];
+ assert.deepEqual(selectTasks(entries,'open',' ORGANIZACAO ',due).map(t=>t.id),['a']);
+ assert.equal(selectTasks(entries,'all','   ',due).length,2);
+});
+test('estados desconhecidos não entram como abertos nem geram prazo ultrapassado',()=>{
+ const entry=task('unknown',new Date(due-1).toISOString(),'unrecognized');
+ assert.equal(isDue(entry,due),false);
+ assert.deepEqual(selectTasks([entry],'open','',due),[]);
+ assert.deepEqual(selectTasks([entry],'all','',due),[entry]);
+});
