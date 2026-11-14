@@ -1,0 +1,35 @@
+const {chromium}=require('playwright');
+const mock=`export const configured=true;
+const at=(h)=>{const d=new Date();d.setHours(h,0,0,0);return d.toISOString()};
+const records={profiles:{id:'fictional-user',organization_id:'fictional-org',health_unit_id:'fictional-unit',full_name:'Profissional Fictícia',role:'nurse',active:true},patients:[{id:'p',full_name:'Paciente Fictício',local_code:'TESTE-01',status:'active'}],care_tasks:[{id:'t',title:'Conferir materiais fictícios',status:'pending',due_at:at(10)}],home_visits:[{id:'v',patient_id:'p',status:'planned',scheduled_at:at(14)},{id:'other',patient_id:'p',status:'planned',scheduled_at:at(16)}],encounters:[]};
+export const supabase={auth:{getUser:async()=>({data:{user:{id:'fictional-user'}}}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}}),signOut:async()=>{}},rpc:async()=>({data:null,error:{message:'mock'}}),from:(table)=>{const b={select:()=>b,eq:()=>b,order:()=>b,maybeSingle:async()=>({data:records[table],error:null}),limit:async()=>{await new Promise(r=>setTimeout(r,250));return window.failData?{data:null,error:{message:'mock failure'}}:{data:records[table],error:null}}};return b}};`;
+(async()=>{const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE||undefined,args:['--no-sandbox']});
+for(const width of [390,1280]){const page=await browser.newPage({viewport:{width,height:1000}});
+await page.route('**/src/supabase.ts',r=>r.fulfill({contentType:'application/javascript',body:mock}));
+await page.goto(process.env.PLAYWRIGHT_BASE_URL||'http://127.0.0.1:5173/');
+await page.getByRole('heading',{name:'Sua agenda de hoje'}).waitFor();
+await page.getByRole('button',{name:'Abrir tarefas: Conferir materiais fictícios'}).click();
+await page.getByText('Tarefa aberta pela agenda do dia.').waitFor();
+if(!await page.evaluate(()=>document.activeElement.classList.contains('record-focus')))throw Error('Task focus');
+await page.getByRole('button',{name:'Voltar à agenda'}).click();
+await page.getByRole('button',{name:'Abrir visitas: Visita domiciliar'}).first().click();
+await page.getByText('Visita aberta pela agenda do dia.').waitFor();
+if(await page.locator('.visits-list li').count()!==1)throw Error('Visit selection');
+if(!await page.evaluate(()=>document.activeElement.classList.contains('record-focus')))throw Error('Visit focus');
+await page.getByRole('button',{name:'Ver lista completa'}).click();
+if(await page.locator('.visits-list li').count()!==2)throw Error('Full list');
+// Return using the desktop or mobile panel navigation.
+if(width<650)await page.getByRole('navigation',{name:'Acesso rápido do aplicativo'}).getByRole('button',{name:'Painel',exact:true}).click();
+else await page.locator('aside').getByRole('button',{name:'Painel geral'}).click();
+await page.evaluate(()=>window.failData=true);
+await page.getByRole('button',{name:'Atualizar',exact:true}).click();
+await page.getByText('Atualizando a agenda do dia...').waitFor();
+if(await page.getByText(/Nenhuma pendência de hoje/).count())throw Error('False empty during load');
+await page.getByText('A agenda não pôde ser atualizada. Consulte novamente antes de organizar suas pendências.').waitFor();
+if(await page.locator('.daily-agenda-list').count())throw Error('Stale agenda on error');
+await page.evaluate(()=>window.failData=false);await page.getByRole('button',{name:'Tentar novamente'}).click();
+await page.getByRole('button',{name:'Abrir tarefas: Conferir materiais fictícios'}).waitFor();
+if(await page.getByText('Erro ao consultar dados autorizados.',{exact:true}).count())throw Error('Error not cleared after retry');
+if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))throw Error('Overflow');
+console.log('PASS '+width+'px: task/visit selection, keyboard focus, return/full list, loading/error/retry');await page.close();}
+await browser.close();})().catch(e=>{console.error(e);process.exit(1)});

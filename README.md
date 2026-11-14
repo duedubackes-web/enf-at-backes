@@ -100,3 +100,14 @@ ENF@BACKES agora possui uma **PWA**, com manifesto, ícones, tela offline segura
 Os módulos de pacientes, tarefas e agentes continuam **dependentes de conexão segura**. O service worker armazena apenas uma página genérica offline; não grava registros clínicos em cache. Instalação PWA não significa aplicativo nativo publicado nas lojas.
 
 Detalhes: [`ENF@BACKES/PLATAFORMAS.md`](ENF@BACKES/PLATAFORMAS.md).
+
+### Fluxo da agenda no navegador (dados fictícios)
+
+Com o servidor de desenvolvimento em execução (`npm run dev`), execute em outro terminal:
+
+```bash
+npx playwright install chromium
+npm run test:browser
+```
+
+O teste intercepta apenas o módulo Supabase no navegador e usa registros fictícios em memória, sem consultar o banco. Verifica abertura da tarefa/visita exata, foco de teclado, retorno à agenda, lista completa, carregamento, falha e nova tentativa nas larguras de 390 e 1280 px. Não substitui testes de Auth/RLS ou dispositivos físicos. Para outro servidor local, informe `PLAYWRIGHT_BASE_URL`; para Chromium já instalado, informe `PLAYWRIGHT_CHROMIUM_EXECUTABLE` com o caminho do executável.
