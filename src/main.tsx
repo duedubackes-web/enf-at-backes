@@ -1,6 +1,6 @@
 import React,{useCallback,useEffect,useState} from 'react';
 import {createRoot} from 'react-dom/client';
-import {Activity,HeartPulse,Users,ClipboardList,CalendarDays,FileText,ShieldCheck,LogOut,RefreshCw,Layers3,BotMessageSquare,ClipboardCheck,BookOpen,Calculator} from 'lucide-react';
+import {Activity,HeartPulse,Users,ClipboardList,CalendarDays,FileText,ShieldCheck,LogOut,RefreshCw,Layers3,BotMessageSquare,ClipboardCheck,BookOpen} from 'lucide-react';
 import {supabase,type Profile,type Patient,type Task,type Visit,type Encounter} from './supabase';
 import Landing from './Landing';
 import CarePrograms from './CarePrograms';
