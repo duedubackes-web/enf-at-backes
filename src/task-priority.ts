@@ -1,6 +1,6 @@
 export type Status='pending'|'in_progress'|'completed'|'cancelled';
 export type FilterMode='open'|'overdue'|'upcoming'|'today'|'done'|'all';
-type PrioritizedTask={title:string;status:Status;due_at:string|null};
+type PrioritizedTask={title:string;status:string;due_at:string|null};
 const isOpen=(task:PrioritizedTask)=>task.status==='pending'||task.status==='in_progress';
 const deadline=(task:PrioritizedTask)=>task.due_at===null?NaN:Date.parse(task.due_at);
 
@@ -29,9 +29,10 @@ export function isToday(task:PrioritizedTask,now:number){
  return date.getFullYear()===today.getFullYear()&&date.getMonth()===today.getMonth()&&date.getDate()===today.getDate();
 }
 export function selectTasks<T extends PrioritizedTask>(tasks:readonly T[],filter:FilterMode,search:string,now:number):T[]{
- const query=search.toLocaleLowerCase('pt-BR');
+ const normalize=(value:string)=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR').trim();
+ const query=normalize(search);
  return tasks.filter(task=>{
-  if(!task.title.toLocaleLowerCase('pt-BR').includes(query))return false;
+  if(!normalize(task.title).includes(query))return false;
   if(filter==='open')return isOpen(task);
   if(filter==='overdue')return isDue(task,now);
   if(filter==='upcoming')return isUpcoming(task,now);

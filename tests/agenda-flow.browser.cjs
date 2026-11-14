@@ -14,10 +14,10 @@ if(!await page.evaluate(()=>document.activeElement.classList.contains('record-fo
 await page.getByRole('button',{name:'Voltar à agenda'}).click();
 await page.getByRole('button',{name:'Abrir visitas: Visita domiciliar'}).first().click();
 await page.getByText('Visita aberta pela agenda do dia.').waitFor();
-if(await page.locator('.visits-list li').count()!==1)throw Error('Visit selection');
+if(await page.locator('.worklist-list li').count()!==1)throw Error('Visit selection');
 if(!await page.evaluate(()=>document.activeElement.classList.contains('record-focus')))throw Error('Visit focus');
 await page.getByRole('button',{name:'Ver lista completa'}).click();
-if(await page.locator('.visits-list li').count()!==2)throw Error('Full list');
+if(await page.locator('.worklist-list li').count()!==2)throw Error('Full list');
 // Return using the desktop or mobile panel navigation.
 if(width<650)await page.getByRole('navigation',{name:'Acesso rápido do aplicativo'}).getByRole('button',{name:'Painel',exact:true}).click();
 else await page.locator('aside').getByRole('button',{name:'Painel geral'}).click();

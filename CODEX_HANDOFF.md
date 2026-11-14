@@ -41,3 +41,7 @@ All 13 versions in `supabase/migrations/` were taken from the remote `supabase_m
 
 ## Cross-platform PWA update
 Branch `feat/cross-platform-pwa-v12` provides: manifest + PNG icons, iOS metadata, secure offline fallback, responsive authenticated bottom navigation and install instructions. After the PR merges, these files become part of main. **Do not cache API/clinical responses**. Native app stores are a separate roadmap, not delivered yet.
+
+## Continuação das filas e agenda
+
+Consulte [`ENF@BACKES/STATUS-DE-DESENVOLVIMENTO.md`](ENF@BACKES/STATUS-DE-DESENVOLVIMENTO.md) para a cadeia de branches/PRs, mapa dos componentes, comandos de teste e prioridades. As entregas desta sequência ainda dependem de revisão; não assumir que estejam em `main` ou em produção. Tarefas e visitas compartilham `src/worklist.css` e mantêm as regras de seleção em módulos separados da interface.
