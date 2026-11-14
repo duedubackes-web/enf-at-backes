@@ -20,7 +20,7 @@ Sem internet, mostra a tela estática de reconexão, sem renderizar prontuários
 - A instalação, suporte a ícones e comportamento de prompt podem variar entre navegadores e versões do sistema.
 
 ## Próximos passos para Codex
-1. Gerar ícones PNG 192x192 e 512x512, plus apple-touch-icon 180x180 de marca própria (o SVG é um fallback inicial).
+1. Validar ícones PNG 192x192 e 512x512 e apple-touch-icon 180x180 de marca própria em Chrome Android e Safari iOS.
 2. Testes reais com Safari iOS, Chrome Android, tablets e desktop usando contas e dados fictícios.
 3. Testes automatizados de manifest, service worker e navegação para evitar regressões.
 4. Avaliar empacotamento nativo com Capacitor **somente após** validação de autenticação, LGPD, notificações e requisitos de lojas.
