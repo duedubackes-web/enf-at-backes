@@ -5,6 +5,7 @@ import {
  BarChart3,Workflow,Eye,Clock3,Sparkles,X,MapPinned,BookOpen,Calculator
 } from 'lucide-react';
 import {configured,supabase} from './supabase';
+import InstallApp from './InstallApp';
 
 const features=[
  {icon:ClipboardList,eyebrow:'GESTÃO DE ROTINA',name:'Organização sem sobrecarga',description:'Centralize tarefas, responsáveis e pendências de cada turno em um único ambiente.',tone:'cyan'},
@@ -82,6 +83,7 @@ export default function Landing(){
       <h1>Mais inteligência na gestão.<br/><span>Mais tempo para cuidar.</span></h1>
       <p>Uma experiência integrada para organizar o trabalho da enfermagem, acompanhar a jornada do paciente e transformar a rotina em decisões mais claras.</p>
       <div className="lp-hero-actions"><button className="lp-btn lp-btn-primary" onClick={openLogin}>Acessar plataforma <ArrowRight size={19}/></button><a className="lp-btn lp-btn-outline" href="#recursos">Explorar recursos <ChevronDown size={18}/></a></div>
+      <InstallApp/>
       <div className="lp-hero-checks"><span><CheckCircle2 size={16}/> Rotina organizada</span><span><CheckCircle2 size={16}/> Visão assistencial</span><span><CheckCircle2 size={16}/> Segurança de acesso</span></div>
      </div>
      <div className="lp-dashboard-wrap" aria-label="Prévia ilustrativa do dashboard, com dados fictícios">
