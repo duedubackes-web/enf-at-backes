@@ -1,6 +1,6 @@
 import React,{useCallback,useEffect,useRef,useState} from 'react';
 import {createRoot} from 'react-dom/client';
-import {Activity,HeartPulse,Users,ClipboardList,CalendarDays,FileText,ShieldCheck,LogOut,RefreshCw,Layers3,BotMessageSquare,ClipboardCheck,BookOpen,Menu,House,MoreHorizontal,X,Smartphone} from 'lucide-react';
+import {Activity,HeartPulse,Users,ClipboardList,CalendarDays,FileText,ShieldCheck,LogOut,RefreshCw,Layers3,BotMessageSquare,ClipboardCheck,BookOpen,House,MoreHorizontal,X} from 'lucide-react';
 import {supabase,type Profile,type Patient,type Task,type Visit,type Encounter} from './supabase';
 import Landing from './Landing';
 import CarePrograms from './CarePrograms';
@@ -33,7 +33,7 @@ const [patientName,setPatientName]=useState(''),[patientCode,setPatientCode]=use
 const [taskTitle,setTaskTitle]=useState(''),[selectedPatient,setSelectedPatient]=useState('');
 const [visitWhen,setVisitWhen]=useState(''),[notes,setNotes]=useState('');
 useEffect(()=>{const dialog=mobileDialog.current;if(!dialog)return;if(mobileMenu&&!dialog.open)dialog.showModal();if(!mobileMenu&&dialog.open)dialog.close();},[mobileMenu]);
-const canClinical=profile?.role='nurse'||profile?.role==='coordinator';
+const canClinical=profile?.role==='nurse'||profile?.role==='coordinator';
 const canTask=canClinical||profile?.role==='technician';
 const refresh=useCallback(async(uid:string)=>{
  if(!supabase)return;
