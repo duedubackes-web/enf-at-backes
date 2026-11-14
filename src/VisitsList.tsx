@@ -1,0 +1,25 @@
+import {useEffect,useState} from 'react';
+import {CalendarDays,Check,Search} from 'lucide-react';
+import {isVisitOverdue,isVisitToday,selectVisits,visitStatusLabel,type PlannedVisit,type VisitPatient,type VisitFilter} from './visit-planning';
+import './visits-list.css';
+const filters:{id:VisitFilter;label:string}[]=[{id:'planned',label:'Previstas'},{id:'today',label:'Hoje'},{id:'overdue',label:'Horário ultrapassado'},{id:'completed',label:'Realizadas'},{id:'all',label:'Todas'}];
+export default function VisitsList({visits,patients,canComplete,busy,onComplete}:{visits:PlannedVisit[];patients:VisitPatient[];canComplete:boolean;busy:boolean;onComplete:(id:string)=>void}){
+ const [filter,setFilter]=useState<VisitFilter>('planned');
+ const [search,setSearch]=useState('');
+ const [now,setNow]=useState(Date.now);
+ useEffect(()=>{const timer=window.setInterval(()=>setNow(Date.now()),30000);return()=>window.clearInterval(timer)},[]);
+ const selected=selectVisits(visits,patients,filter,search,now);
+ const patientMap=new Map(patients.map(p=>[p.id,p]));
+ const counts=[{label:'Previstas',value:visits.filter(v=>v.status==='planned').length},{label:'Hoje (exceto canceladas)',value:visits.filter(v=>v.status!=='cancelled'&&isVisitToday(v,now)).length},{label:'Horário ultrapassado',value:visits.filter(v=>isVisitOverdue(v,now)).length}];
+ return <div className="visits-worklist">
+  <div className="visits-summary" aria-label="Resumo das visitas carregadas">{counts.map(item=><div key={item.label}><strong>{item.value}</strong><span>{item.label}</span></div>)}</div>
+  <label className="visits-search"><Search size={18}/><span className="visits-sr-only">Buscar visitas por paciente ou código local</span><input type="search" placeholder="Buscar paciente ou código local" value={search} onChange={e=>setSearch(e.target.value)}/></label>
+  <div className="visits-filters" role="group" aria-label="Filtrar visitas">{filters.map(item=><button type="button" key={item.id} aria-pressed={filter===item.id} onClick={()=>setFilter(item.id)}>{item.label}</button>)}</div>
+  <p className="visits-result" role="status">{selected.length} {selected.length===1?'visita encontrada':'visitas encontradas'} nos registros carregados.</p>
+  {selected.length?<ul className="visits-list">{selected.map(visit=>{
+   const patient=patientMap.get(visit.patient_id),date=new Date(visit.scheduled_at),valid=Number.isFinite(date.getTime());
+   return <li key={visit.id}><span className="visits-calendar"><CalendarDays size={21}/></span><div className="visits-detail"><strong>{patient?.full_name||'Paciente da unidade'}</strong>{patient&&<small>Código local: {patient.local_code}</small>}{valid?<time dateTime={date.toISOString()}>{date.toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</time>:<small>Data indisponível</small>}</div><div className="visits-state"><span>{visitStatusLabel(visit.status)}</span>{isVisitOverdue(visit,now)&&<small>Horário ultrapassado</small>}</div>{canComplete&&visit.status==='planned'&&<button type="button" className="visits-complete" disabled={busy} aria-label={`Marcar visita de ${patient?.full_name||'paciente da unidade'} em ${valid?date.toLocaleString('pt-BR'):'data indisponível'} como realizada`} onClick={()=>onComplete(visit.id)}><Check size={17}/> Marcar realizada</button>}</li>;
+  })}</ul>:<div className="visits-empty"><CalendarDays size={26}/><p>{visits.length?'Nenhuma visita corresponde à busca e ao filtro.':'Nenhuma visita carregada. Use o formulário acima para agendar.'}</p>{(filter!=='all'||search)&&<button type="button" onClick={()=>{setFilter('all');setSearch('')}}>Ver todas as visitas carregadas</button>}</div>}
+  <p className="visits-note">Resumo e filtros consideram até 200 visitas carregadas, ordenadas pela data do agendamento. Busca por paciente considera os cadastros carregados. Datas no horário deste dispositivo; horário ultrapassado é um sinal administrativo.</p>
+ </div>;
+}
