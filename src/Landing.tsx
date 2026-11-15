@@ -1,6 +1,6 @@
 import {useEffect,useRef,useState,type FormEvent} from 'react';
 import {
- Activity,ArrowRight,ArrowUpRight,Check,CheckCircle2,ChevronDown,ClipboardList,
+ Activity,ArrowRight,ArrowUpRight,Check,CheckCircle2,ClipboardList,
  HeartPulse,LockKeyhole,Menu,ShieldCheck,Stethoscope,Users,CalendarDays,
  BarChart3,Workflow,Eye,Clock3,Sparkles,X,MapPinned,BookOpen,Calculator
 } from 'lucide-react';
@@ -82,7 +82,7 @@ export default function Landing(){
       <div className="lp-eyebrow"><span><Sparkles size={14}/></span> O FUTURO DA GESTÃO EM ENFERMAGEM</div>
       <h1>Mais inteligência na gestão.<br/><span>Mais tempo para cuidar.</span></h1>
       <p>Uma experiência integrada para organizar o trabalho da enfermagem, acompanhar a jornada do paciente e transformar a rotina em decisões mais claras.</p>
-      <div className="lp-hero-actions"><button className="lp-btn lp-btn-primary" onClick={openLogin}>Acessar plataforma <ArrowRight size={19}/></button><a className="lp-btn lp-btn-outline" href="#recursos">Explorar recursos <ChevronDown size={18}/></a></div>
+      <div className="lp-hero-actions"><button className="lp-btn lp-btn-primary" onClick={openLogin}>Acessar plataforma <ArrowRight size={19}/></button><a className="lp-btn lp-btn-outline" href="/?demo=1">Ver demonstração <ArrowRight size={18}/></a></div>
       <InstallApp/>
       <div className="lp-hero-checks"><span><CheckCircle2 size={16}/> Rotina organizada</span><span><CheckCircle2 size={16}/> Visão assistencial</span><span><CheckCircle2 size={16}/> Segurança de acesso</span></div>
      </div>

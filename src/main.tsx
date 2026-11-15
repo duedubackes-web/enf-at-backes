@@ -9,6 +9,7 @@ import OperationalOverview from './OperationalOverview';
 import DailyAgenda from './DailyAgenda';
 import VisitsList from './VisitsList';
 import TasksList from './TasksList';
+const DemoApp=React.lazy(()=>import('./DemoApp'));
 import TaskOffice from './TaskOffice';
 import KnowledgeCenter from './KnowledgeCenter';
 import InstallApp from './InstallApp';
@@ -109,4 +110,4 @@ return <div className="shell"><div className="mobile-topbar"><span className="mo
 <dialog ref={mobileDialog} className="mobile-drawer" aria-label="Menu completo do ENF@BACKES" onClose={()=>setMobileMenu(false)}><div className="mobile-drawer-head"><b>Menu profissional</b><button type="button" aria-label="Fechar menu" onClick={()=>setMobileMenu(false)}><X size={21}/></button></div><div className="mobile-drawer-links">{menu.map(x=><button type="button" key={x.id} onClick={()=>navigate(x.id)} aria-current={tab===x.id?'page':undefined}><x.icon size={19}/>{x.label}</button>)}</div><div className="mobile-drawer-account"><span>{profile.full_name}</span><button type="button" onClick={()=>void supabase?.auth.signOut()}><LogOut size={18}/> Sair da conta</button></div></dialog>
 </div>;
 }
-createRoot(document.getElementById('root')!).render(<React.StrictMode><App/></React.StrictMode>);
+createRoot(document.getElementById('root')!).render(<React.StrictMode>{new URLSearchParams(window.location.search).get('demo')==='1'?<React.Suspense fallback={<p role="status">Preparando demonstração...</p>}><DemoApp/></React.Suspense>:<App/>}</React.StrictMode>);
