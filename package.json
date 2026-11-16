@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "check:deploy": "node scripts/check-deploy.mjs",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
-    "test:browser": "node tests/agenda-flow.browser.cjs && node tests/worklists.browser.cjs && node tests/demo.browser.cjs"
+    "test:browser": "node tests/agenda-flow.browser.cjs && node tests/worklists.browser.cjs && node tests/demo.browser.cjs && node tests/openbot.browser.cjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.75.0",

@@ -47,3 +47,11 @@ Os testes de navegador consideram 390 e 1280 px. Testes simulados verificam a in
 | 4 | Validar uso em dispositivos reais | Instalação, teclado, menu, safe areas e saída em Android, iPhone e desktop |
 
 A agenda e as listas usam os registros já carregados, limitados a 200 por módulo. Permanecem pendentes a homologação institucional, a revisão clínica, a governança LGPD e os testes de recuperação. Não inserir dados reais antes dessas aprovações.
+
+## Assistente interno e carregamento sob demanda
+
+Na branch `feat/openbot-and-route-optimization`, o OpenBot oferece navegação e resumo administrativo com regras locais, tanto no aplicativo quanto na demonstração. Não executa gravações nem se conecta a modelos externos. A consulta do resumo usa contagens calculadas no instante da pergunta, sem nomes ou títulos de registros. A interface mostra a limitação de amostragem.
+
+`src/openbot.ts` separa regras e destinos permitidos da interface modal em `src/OpenBot.tsx`. O fechamento limpa a pergunta/resposta e devolve o foco ao botão. Os testes de navegador cobrem atualização das contagens após conclusão de tarefa, navegação, Escape, foco e ausência de consultas à API REST na demonstração.
+
+As quatro áreas de biblioteca, agentes, Central de Trabalho e linhas de cuidado passam a usar imports dinâmicos. Conferir os tamanhos emitidos pelo build para comparar carga inicial; essa métrica não equivale a uma medição de velocidade de página em dispositivos reais.

@@ -3,6 +3,9 @@ import {Activity,ArrowLeft,CalendarDays,ClipboardList,HeartPulse,RotateCcw,Users
 import DailyAgenda from './DailyAgenda';
 import TasksList from './TasksList';
 import VisitsList from './VisitsList';
+import OpenBot from './OpenBot';
+import {summarizeTasks} from './task-priority';
+import {isVisitOverdue} from './visit-planning';
 import './demo.css';
 type Tab='overview'|'tasks'|'visits'|'patients';
 const menu=[{id:'overview',label:'Painel do dia',icon:Activity},{id:'tasks',label:'Tarefas da equipe',icon:ClipboardList},{id:'visits',label:'Visitas domiciliares',icon:CalendarDays},{id:'patients',label:'Pacientes fictícios',icon:Users}] as const;
@@ -30,5 +33,6 @@ export default function DemoApp(){
    {tab==='patients'&&<section className="panel"><h2>Cadastros de exemplo</h2><p className="notice">Estes identificadores são fictícios e servem apenas para explorar o layout.</p>{patients.map(patient=><div className="item" key={patient.id}><span>{patient.full_name}</span><small>{patient.local_code}</small><em>Exemplo</em></div>)}</section>}
    <footer>Demonstração interativa · Nenhum cadastro ou registro desta tela é enviado ao banco. O acesso profissional continua na área institucional.</footer>
   </main></div>
+  <OpenBot demo getSnapshot={()=>({openTasks:summarizeTasks(data.tasks,Date.now()).open,overdueTasks:summarizeTasks(data.tasks,Date.now()).overdue,plannedVisits:data.visits.filter(visit=>visit.status==='planned').length,overdueVisits:data.visits.filter(visit=>isVisitOverdue(visit,Date.now())).length})} destinations={['overview','tasks','visits','patients']} onNavigate={destination=>navigate(destination as Tab)}/>
  </div>;
 }

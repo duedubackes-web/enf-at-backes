@@ -3,15 +3,18 @@ import {createRoot} from 'react-dom/client';
 import {Activity,HeartPulse,Users,ClipboardList,CalendarDays,FileText,ShieldCheck,LogOut,RefreshCw,Layers3,BotMessageSquare,ClipboardCheck,BookOpen,House,MoreHorizontal,X} from 'lucide-react';
 import {supabase,type Profile,type Patient,type Task,type Visit,type Encounter} from './supabase';
 import Landing from './Landing';
-import CarePrograms from './CarePrograms';
-import NursingCommand from './NursingCommand';
+const CarePrograms=React.lazy(()=>import('./CarePrograms'));
+const NursingCommand=React.lazy(()=>import('./NursingCommand'));
 import OperationalOverview from './OperationalOverview';
 import DailyAgenda from './DailyAgenda';
 import VisitsList from './VisitsList';
 import TasksList from './TasksList';
+import OpenBot from './OpenBot';
+import {summarizeTasks} from './task-priority';
+import {isVisitOverdue} from './visit-planning';
 const DemoApp=React.lazy(()=>import('./DemoApp'));
-import TaskOffice from './TaskOffice';
-import KnowledgeCenter from './KnowledgeCenter';
+const TaskOffice=React.lazy(()=>import('./TaskOffice'));
+const KnowledgeCenter=React.lazy(()=>import('./KnowledgeCenter'));
 import InstallApp from './InstallApp';
 import './pwa';
 import './platform.css';
@@ -100,12 +103,13 @@ return <div className="shell"><div className="mobile-topbar"><span className="mo
 {tab==='tasks'&&<section className="panel"><h2>Tarefas da equipe</h2>{canTask&&<form className="rowform" onSubmit={e=>{e.preventDefault();void save('care_tasks',{title:taskTitle.trim(),created_by:user},()=>setTaskTitle(''))}}><input aria-label="Tarefa" placeholder="Nova tarefa" minLength={3} maxLength={200} required value={taskTitle} onChange={e=>setTaskTitle(e.target.value)}/><button disabled={busy}>Adicionar</button></form>}<TasksList tasks={tasks} canEdit={canTask} busy={busy} selectedId={selectedRecord?.tab==='tasks'?selectedRecord.id:undefined} onClearSelection={()=>setSelectedRecord(null)} onBackToAgenda={()=>navigate('overview')} onSetStatus={(id,status)=>void update('care_tasks',id,{status,completed_at:status==='completed'?new Date().toISOString():null})}/></section>}
 {tab==='visits'&&<section className="panel"><h2>Visitas domiciliares</h2>{canTask&&<form className="rowform" onSubmit={e=>{e.preventDefault();const dt=new Date(visitWhen);if(!Number.isFinite(dt.valueOf())||dt.getTime()<Date.now()){setError('Informe uma data futura válida.');return;}void save('home_visits',{patient_id:selectedPatient,created_by:user,scheduled_at:dt.toISOString()},()=>{setVisitWhen('');setSelectedPatient('')})}}><select required aria-label="Paciente" value={selectedPatient} onChange={e=>setSelectedPatient(e.target.value)}><option value="">Selecionar paciente</option>{patients.map(p=><option key={p.id} value={p.id}>{p.full_name}</option>)}</select><input required aria-label="Data e hora" type="datetime-local" value={visitWhen} onChange={e=>setVisitWhen(e.target.value)}/><button disabled={busy||!patients.length}>Agendar</button></form>}<VisitsList selectedId={selectedRecord?.tab==='visits'?selectedRecord.id:undefined} onClearSelection={()=>setSelectedRecord(null)} onBackToAgenda={()=>navigate('overview')} visits={visits} patients={patients} canComplete={canTask} busy={busy} onComplete={id=>void update('home_visits',id,{status:'completed',completed_at:new Date().toISOString()})}/></section>}
 {tab==='encounters'&&<section className="panel"><h2>Atendimentos de enfermagem</h2>{canClinical&&<form className="vertical" onSubmit={e=>{e.preventDefault();void save('encounters',{patient_id:selectedPatient,author_id:user,notes:notes.trim(),status:'draft',encounter_type:'nursing'},()=>{setNotes('');setSelectedPatient('')})}}><select required aria-label="Paciente" value={selectedPatient} onChange={e=>setSelectedPatient(e.target.value)}><option value="">Selecionar paciente</option>{patients.map(p=><option key={p.id} value={p.id}>{p.full_name}</option>)}</select><textarea aria-label="Anotação" value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Registro descritivo (rascunho), sem diagnóstico automatizado" maxLength={5000} rows={4}/><button disabled={busy||!patients.length}>Salvar rascunho</button></form>}{encounters.map(e=><div className="item" key={e.id}><span>{patientLabel(e.patient_id)} · {new Date(e.occurred_at).toLocaleString('pt-BR')}</span><em>{e.status}</em>{canClinical&&e.status==='draft'&&<button className="ghost" disabled={busy} onClick={()=>{if(window.confirm('Finalizar? O atendimento ficará imutável.'))void update('encounters',e.id,{status:'finalized'})}}>Finalizar</button>}</div>)}{!encounters.length&&<p className="empty">Sem atendimentos registrados.</p>}<p className="notice">Adendos rastreáveis estão disponíveis no banco. O formulário de adendos e a homologação documental seguem em desenvolvimento.</p></section>}
-{tab==='programs'&&<CarePrograms patients={patients} profile={profile} canClinical={canClinical} />}
-{tab==='assistant'&&<NursingCommand profile={profile} />}
-{tab==='office'&&<TaskOffice profile={profile} />}
-{tab==='knowledge'&&<KnowledgeCenter profile={profile} />}
+{tab==='programs'&&<React.Suspense fallback={<p role="status">Carregando módulo...</p>}><CarePrograms patients={patients} profile={profile} canClinical={canClinical} /></React.Suspense>}
+{tab==='assistant'&&<React.Suspense fallback={<p role="status">Carregando módulo...</p>}><NursingCommand profile={profile} /></React.Suspense>}
+{tab==='office'&&<React.Suspense fallback={<p role="status">Carregando módulo...</p>}><TaskOffice profile={profile} /></React.Suspense>}
+{tab==='knowledge'&&<React.Suspense fallback={<p role="status">Carregando módulo...</p>}><KnowledgeCenter profile={profile} /></React.Suspense>}
 {tab==='security'&&<section className="panel"><h2>Segurança e governança</h2><p>Profissional: {profile.full_name} · perfil: {profile.role}</p><p>O banco aplica isolamento por unidade e políticas RLS. Usuários não podem atribuir a si próprios um perfil.</p><p>Auditoria de alterações no schema privado; auditoria de leituras, backups e testes de permissões requerem validação institucional.</p><p>Diretrizes OMS/OPAS orientam o roadmap, sem recomendações clínicas autônomas.</p></section>}
 <footer>MVP técnico • Não utilizar com informações reais de pacientes antes da homologação institucional.</footer></main>
+<OpenBot getSnapshot={()=>dataState==='ready'?{openTasks:summarizeTasks(tasks,Date.now()).open,overdueTasks:summarizeTasks(tasks,Date.now()).overdue,plannedVisits:visits.filter(visit=>visit.status==='planned').length,overdueVisits:visits.filter(visit=>isVisitOverdue(visit,Date.now())).length}:null} destinations={['overview','tasks','visits','patients','office','assistant','knowledge']} onNavigate={navigate}/>
 <nav className="mobile-bottom-nav" aria-label="Acesso rápido do aplicativo">{([{id:'overview',icon:House,label:'Painel'},{id:'tasks',icon:ClipboardList,label:'Tarefas'},{id:'assistant',icon:BotMessageSquare,label:'Agentes'},{id:'knowledge',icon:BookOpen,label:'Biblioteca'}] as const).map(x=><button key={x.id} type="button" aria-current={tab===x.id?'page':undefined} onClick={()=>navigate(x.id)}><x.icon size={21}/><span>{x.label}</span></button>)}<button type="button" onClick={()=>setMobileMenu(true)} aria-label="Abrir menu completo"><MoreHorizontal size={22}/><span>Mais</span></button></nav>
 <dialog ref={mobileDialog} className="mobile-drawer" aria-label="Menu completo do ENF@BACKES" onClose={()=>setMobileMenu(false)}><div className="mobile-drawer-head"><b>Menu profissional</b><button type="button" aria-label="Fechar menu" onClick={()=>setMobileMenu(false)}><X size={21}/></button></div><div className="mobile-drawer-links">{menu.map(x=><button type="button" key={x.id} onClick={()=>navigate(x.id)} aria-current={tab===x.id?'page':undefined}><x.icon size={19}/>{x.label}</button>)}</div><div className="mobile-drawer-account"><span>{profile.full_name}</span><button type="button" onClick={()=>void supabase?.auth.signOut()}><LogOut size={18}/> Sair da conta</button></div></dialog>
 </div>;
