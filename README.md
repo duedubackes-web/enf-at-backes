@@ -111,3 +111,11 @@ npm run test:browser
 ```
 
 O teste intercepta apenas o módulo Supabase no navegador e usa registros fictícios em memória, sem consultar o banco. Verifica abertura da tarefa/visita exata, foco de teclado, retorno à agenda, lista completa, carregamento, falha e nova tentativa nas larguras de 390 e 1280 px. Não substitui testes de Auth/RLS ou dispositivos físicos. Para outro servidor local, informe `PLAYWRIGHT_BASE_URL`; para Chromium já instalado, informe `PLAYWRIGHT_CHROMIUM_EXECUTABLE` com o caminho do executável.
+
+### OpenBot — assistente interno
+
+O botão OpenBot aparece na área profissional e na demonstração (`/?demo=1`). Ele usa regras locais para explicar os módulos, oferecer atalhos e resumir contagens de tarefas e visitas já carregadas. Não é uma integração com uma plataforma externa nem um modelo generativo.
+
+O resumo é calculado quando a pergunta é feita; se a consulta ainda não terminou ou falhou, o bot informa a indisponibilidade em vez de apresentar números. Não cria, altera ou exclui registros: os atalhos levam aos módulos existentes. Não envia perguntas a serviços externos e não salva a conversa. As contagens continuam limitadas à amostra carregada de até 200 registros por módulo.
+
+Regras e testes ficam em `src/openbot.ts` e `tests/openbot.test.mjs`; a interface em `src/OpenBot.tsx`. `npm run test:browser` também verifica o assistente em celular/desktop. Biblioteca, Central de Agentes, Central de Trabalho e Linhas de Cuidado são carregadas sob demanda.
